@@ -4,9 +4,13 @@
   "author": "YiJie <yijie4188@gmail.com>",
   "version": "0.1.0",
   "license": "MIT",
-  "workspaces": ["packages/*"],
-  "scripts": {
-  },
-  "dependencies": {
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.15.12",
+    "esbuild-register": "^3.3.3"
   }
 }
