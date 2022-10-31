@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "@workspaces/linearite",
+  "author": "YiJie <yijie4188@gmail.com>",
+  "version": "0.1.0",
+  "license": "MIT",
+  "workspaces": ["packages/*"],
+  "scripts": {
+  },
+  "dependencies": {
+  }
+}
