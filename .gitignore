@@ -1,3 +1,6 @@
+# Lock
+*.lock
+
 # IDE
 .vscode
 .idea
