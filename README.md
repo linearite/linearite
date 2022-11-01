@@ -20,3 +20,24 @@
     * [ ] 通过触发 hook，联动 builder 进行构建
   * [ ] 版本管理
 * [ ] 简单对 commit message 的规范化
+
+## Demo
+
+```bash
+line init [builder='esbuild']
+# install @linearite/cli, builder-plugin to devDependencies
+# create .linearite.config.${options.ext}
+line build <pkgNames>
+# analyze pkg dependencies, generate build graph
+# build pkg and its dependencies
+line tag [pkgNames]
+# update pkg version
+# commit and tag pkg
+#   * message format: chore[(pkgNames.join(','))]: 
+#   * tag format: pkgNames.map(name => `${name}@version`)
+line publish <pkgNames>
+# if ${options.build}, trigger build command
+# if ${options.plugins.git}, trigger tag command
+# if dependencies changed, trigger publish command
+# publish pkg
+```
