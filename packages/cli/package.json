@@ -1,6 +1,9 @@
 {
   "name": "@linearite/cli",
   "version": "0.1.0",
+  "bin": {
+    "line": "bin/linearite.js"
+  },
   "dependencies": {
   }
 }
