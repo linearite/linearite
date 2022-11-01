@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ESNext",
+    "sourceMap": true,
+    "paths": {
+      "@linearite/*": ["packages/src/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}
