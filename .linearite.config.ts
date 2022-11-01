@@ -1,3 +1,6 @@
 export default {
-  builder: 'esbuild'
+  builder: 'esbuild',
+  depMap: {
+    cli: ['core']
+  }
 }
