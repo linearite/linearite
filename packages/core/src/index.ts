@@ -22,7 +22,7 @@ export namespace Builder {
   export type Options = boolean | Opts['type'] | Opts
 }
 
-namespace Linearite {
+export namespace Linearite {
   export type MacroSytax =
     | `PKG_${ 'NAME' | 'VERSION' }`
     // (pkgName = '@scope/name') => name
