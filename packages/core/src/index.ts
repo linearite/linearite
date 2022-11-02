@@ -57,3 +57,5 @@ export namespace Linearite {
     cmMsgRule?: Inherit | boolean
   }
 }
+
+export default Linearite;
