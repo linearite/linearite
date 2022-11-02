@@ -58,4 +58,4 @@ export namespace Linearite {
   }
 }
 
-export default Linearite;
+export default Linearite
