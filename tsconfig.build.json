@@ -2,7 +2,7 @@
   "extends": "tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@linearite/*": ["packages/dist/*"]
+      "@linearite/*": ["packages/*/dist"]
     }
   }
 }
