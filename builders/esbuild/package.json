@@ -1,0 +1,9 @@
+{
+  "name": "@linearite/plugin-builder-esbuild",
+  "version": "0.1.0",
+  "main": "index.js",
+  "dependencies": {
+    "esbuild": "^0.15.12",
+    "esbuild-register": "^3.3.3"
+  }
+}
