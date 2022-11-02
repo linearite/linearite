@@ -1,6 +1,18 @@
 export namespace Builder {
   export type Platform = 'cjs' | 'esm' | 'iife' | 'umd'
-  export interface CommonOpts {
+  /**
+   * declare module '@linearite/core' {
+   *   export namespace Builder {
+   *     export interface Confs {
+   *       name: SpecialConf
+   *     }
+   *   }
+   * }
+   */
+  export interface Confs {}
+  export type Types = keyof Confs
+  export interface Opts {
+    type: Types
     target: string | string[]
     format: Platform
     define?: Record<string, string>
@@ -8,19 +20,20 @@ export namespace Builder {
     external?: string[]
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
-  export type Opts = {
-    conf: CommonOpts
-  } & ({
-    type: 'esbuild'
-    conf: {}
-  } | {
-    /**
-     * @deprecated unsupported
-     */
-    type: 'swc'
-  })
-  export type Options = boolean | Opts['type'] | Opts
 }
+
+export type Plugin<N extends Builder.Types> = {
+  type: string
+  name: N
+} & ({
+  type: 'command'
+  call: (args: any[], conf: any) => void
+} | {
+  type: 'builder'
+  call: (opts: Builder.Opts & Builder.Confs[N], conf: Linearite.Options) => void
+})
+
+export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
 
 export namespace Linearite {
   export type MacroSytax =
@@ -40,7 +53,7 @@ export namespace Linearite {
     /**
      * builder config
      */
-    builder?: Inherit | Builder.Options
+    builder?: Inherit | boolean | Builder.Types | Builder.Opts
     /**
      * auto with tag when publish package
      *
