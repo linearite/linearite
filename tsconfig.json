@@ -3,8 +3,9 @@
     "module": "CommonJS",
     "target": "ESNext",
     "sourceMap": true,
+    "baseUrl": ".",
     "paths": {
-      "@linearite/*": ["packages/src/*"]
+      "@linearite/*": ["./packages/*/src"]
     }
   },
   "exclude": ["node_modules"]
