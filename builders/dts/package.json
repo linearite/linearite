@@ -1,0 +1,9 @@
+{
+  "name": "@linearite/plugin-builder-dts",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "typescript": "^4.8.4"
+  }
+}
