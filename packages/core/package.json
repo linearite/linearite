@@ -4,5 +4,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "cordis": "^2.5.0"
   }
 }
