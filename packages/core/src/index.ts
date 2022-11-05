@@ -1,40 +1,18 @@
 import { Context } from './context'
+import { Builder } from './builder'
 
+export * from './builder'
 export * from './context'
-
-export namespace Builder {
-  export type Platform = 'cjs' | 'esm' | 'iife' | 'umd'
-  /**
-   * declare module '@linearite/core' {
-   *   export namespace Builder {
-   *     export interface Confs {
-   *       name: SpecialConf
-   *     }
-   *   }
-   * }
-   */
-  export interface Confs {}
-  export type Types = keyof Confs
-  export interface Opts {
-    type: Types
-    target: string | string[]
-    format: Platform
-    define?: Record<string, string>
-    minify?: boolean
-    external?: string[]
-    sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
-  }
-}
 
 export type Plugin<N extends Builder.Types> = {
   type: string
   name: N
 } & ({
   type: 'command'
-  call: (ctx: Context) => void
+  call: (ctx: Context<N>) => void
 } | {
   type: 'builder'
-  call: (ctx: Context, opts: Builder.Opts & Builder.Confs[N]) => void
+  call: (ctx: Context<N>, opts: Builder.Opts & Builder.Confs[N]) => void
 })
 
 export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
