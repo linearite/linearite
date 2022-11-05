@@ -5,5 +5,8 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "cordis": "^2.5.0"
+  },
+  "devDependencies": {
+    "commander": "^9.4.1"
   }
 }
