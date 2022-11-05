@@ -11,6 +11,6 @@ declare module '@linearite/core' {
 export default definePlugin({
   name: 'esbuild',
   type: 'builder',
-  call: (opts, conf) => {
+  call: (ctx, conf) => {
   }
 })
