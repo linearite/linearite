@@ -38,7 +38,18 @@ export class Context<B extends Builder.Types> extends cordis.Context<Context.Con
     super(options)
   }
 
-  regiter<N extends Plugin.Names>(plugin: Plugin<N>) {}
+  regiter(plugin: Plugin<any>) {
+    if (plugin.type === 'command') {
+      plugin.call(this)
+    } else if (plugin.type === 'builder') {
+      plugin.call(this, this[Context.config].builder)
+    } else {
+      throw new Error(`unknown plugin type: ${
+        // @ts-ignore
+        plugin.type
+      }`)
+    }
+  }
 }
 
 export namespace Context {
