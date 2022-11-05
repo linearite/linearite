@@ -42,7 +42,7 @@ export class Context<B extends Builder.Types> extends cordis.Context<Context.Con
     if (plugin.type === 'command') {
       plugin.call(this)
     } else if (plugin.type === 'builder') {
-      plugin.call(this, this[Context.config].builder)
+      throw new Error('builder plugin should not be registered')
     } else {
       throw new Error(`unknown plugin type: ${
         // @ts-ignore
