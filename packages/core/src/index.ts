@@ -53,11 +53,11 @@ export namespace Linearite {
     version: string
     description: string
   }
-  export interface Configuration {
+  export interface Configuration<B extends Builder.Types> {
     /**
      * builder config
      */
-    builder?: Inherit | boolean | Builder.Types | Builder.Opts
+    builder?: Inherit | boolean | Builder.Types | (Builder.Opts & Builder.Confs[B])
     /**
      * auto with tag when publish package
      *
@@ -65,7 +65,7 @@ export namespace Linearite {
      *
      * @default "${{L_NAME}}@${{PKG_VERSION}}"
      */
-    autoTag?: Inherit | boolean | string | ((pkgMeta: PKGMeta, conf: Linearite.Configuration) => string)
+    autoTag?: Inherit | boolean | string | ((pkgMeta: PKGMeta, conf: this) => string)
     /**
      * check commit message
      *
@@ -74,5 +74,7 @@ export namespace Linearite {
     cmMsgRule?: Inherit | boolean
   }
 }
+
+export const defineConfiguration = <B extends Builder.Types>(conf: Linearite.Configuration<B>) => conf
 
 export default Linearite
