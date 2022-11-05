@@ -1,3 +1,7 @@
+import { Context } from './context'
+
+export * from './context'
+
 export namespace Builder {
   export type Platform = 'cjs' | 'esm' | 'iife' | 'umd'
   /**
@@ -27,10 +31,10 @@ export type Plugin<N extends Builder.Types> = {
   name: N
 } & ({
   type: 'command'
-  call: (args: any[], conf: any) => void
+  call: (ctx: Context) => void
 } | {
   type: 'builder'
-  call: (opts: Builder.Opts & Builder.Confs[N], conf: Linearite.Options) => void
+  call: (ctx: Context, opts: Builder.Opts & Builder.Confs[N]) => void
 })
 
 export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
@@ -49,7 +53,7 @@ export namespace Linearite {
     version: string
     description: string
   }
-  export interface Options {
+  export interface Configuration {
     /**
      * builder config
      */
@@ -61,7 +65,7 @@ export namespace Linearite {
      *
      * @default "${{L_NAME}}@${{PKG_VERSION}}"
      */
-    autoTag?: Inherit | boolean | string | ((pkgMeta: PKGMeta, conf: Linearite.Options) => string)
+    autoTag?: Inherit | boolean | string | ((pkgMeta: PKGMeta, conf: Linearite.Configuration) => string)
     /**
      * check commit message
      *
