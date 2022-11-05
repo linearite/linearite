@@ -1,21 +1,7 @@
-import { Context } from './context'
 import { Builder } from './builder'
 
 export * from './builder'
 export * from './context'
-
-export type Plugin<N extends Builder.Types> = {
-  type: string
-  name: N
-} & ({
-  type: 'command'
-  call: (ctx: Context<N>) => void
-} | {
-  type: 'builder'
-  call: (ctx: Context<N>, opts: Builder.Opts & Builder.Confs[N]) => void
-})
-
-export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
 
 export namespace Linearite {
   export type MacroSytax =

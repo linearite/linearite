@@ -3,6 +3,19 @@ import * as cordis from 'cordis'
 import Linearite from './index'
 import { Builder } from './builder'
 
+export type Plugin<N extends Builder.Types> = {
+  type: string
+  name: N
+} & ({
+  type: 'command'
+  call: (ctx: Context<N>) => void
+} | {
+  type: 'builder'
+  call: (ctx: Context<N>, opts: Builder.Opts & Builder.Confs[N]) => void
+})
+
+export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
+
 export interface Events<C extends Context<Builder.Types> = Context<Builder.Types>> extends cordis.Events<C> {
 }
 
