@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import Linearite from '@linearite/core'
+import Linearite, { defineConfiguration } from '@linearite/core'
 
 describe('core', function () {
   it('should test isInherit function', function () {
@@ -12,5 +12,16 @@ describe('core', function () {
     expect(Linearite.isInherit('')).to.be.false
     // @ts-expect-error
     expect(Linearite.isInherit('false')).to.be.false
+  })
+  it('should test defineConfiguration function', () => {
+    expect(defineConfiguration({
+      builder: true,
+      autoTag: true,
+      cmMsgRule: true
+    })).to.be.deep.equal({
+      builder: true,
+      autoTag: true,
+      cmMsgRule: true
+    })
   })
 })
