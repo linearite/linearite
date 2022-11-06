@@ -12,6 +12,9 @@ export namespace Linearite {
   export function isInherit(v: Inherit): v is 'inherit' {
     return ['auto', 'inherit', true].includes(v)
   }
+  export function resolveInherit<T>(v: Inherit | boolean, defaultValue: T): T | false {
+    return v && isInherit(v) ? defaultValue : false
+  }
   export interface PKGMeta {
     name: string
     version: string
