@@ -9,11 +9,8 @@ export namespace Linearite {
     // (pkgName = '@scope/name') => name
     | 'L_NAME'
   export type Inherit = 'auto' | 'inherit' | true
-  export function isInherit(v: Inherit): v is 'inherit' {
+  export function isInherit(v: any): v is 'inherit' {
     return ['auto', 'inherit', true].includes(v)
-  }
-  export function resolveInherit<T>(v: Inherit | boolean, defaultValue: T): T | false {
-    return v && isInherit(v) ? defaultValue : false
   }
   export interface PKGMeta {
     name: string
