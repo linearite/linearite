@@ -1,5 +1,5 @@
 export namespace Builder {
-  export type Platform = 'cjs' | 'esm' | 'iife' | 'umd'
+  export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
   /**
    * declare module '@linearite/core' {
    *   export namespace Builder {
@@ -14,7 +14,7 @@ export namespace Builder {
   export interface Opts {
     type: Types
     target: string | string[]
-    format: Platform
+    format: Format | Format[]
     define?: Record<string, string>
     minify?: boolean
     external?: string[]
