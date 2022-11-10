@@ -4,33 +4,41 @@ import type { Command } from 'commander'
 import Linearite from './index'
 import { Builder } from './builder'
 
-export type Plugin<N extends Plugin.Names> = {
+export type Plugin<B extends Builder.Types> = {
   type: string
-  name: N
+  name: B
 } & ({
   type: 'command'
-  call: (ctx: Context<N>) => void
+  call: (ctx: Context<B>) => void
 } | {
   type: 'builder'
-  conf: Omit<Builder.Opts, 'type'> & Plugin.Confs[N]
-  call: (ctx: Context<N>, opts: Omit<Builder.Opts, 'type'> & Plugin.Confs[N]) => void
+  conf: Omit<Builder.Opts, 'type'> & Builder.Confs[B]
+  call: (ctx: Context<B>, opts: Omit<Builder.Opts, 'type'> & Builder.Confs[B]) => void
 })
 
-export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
+export const definePlugin = <N extends Builder.Types>(plugin: Plugin<N>) => plugin
 
 export namespace Plugin {
-  export interface Confs extends Builder.Confs {}
+  export type BuilderConfs = {
+    [K in `builder-${Builder.Types}`]: K extends `builder-${
+      infer N extends Builder.Types
+    }` ? Builder.Confs[N] : never
+  }
+  export interface Confs extends BuilderConfs {}
   export type Names = keyof Confs
-  function isPlugin(v: any): v is Plugin<Names> {
+  function isPlugin(v: any): v is Plugin<Builder.Types> {
     return v
       && typeof v === 'object'
       && 'type' in v
       && 'name' in v
       && 'call' in v
   }
-  export function r<N extends Plugin.Names>(name: N) {
+  export function r<
+    N extends Plugin.Names,
+    B extends N extends `builder-${infer B}` ? B : never
+  >(name: N) {
     const prefixArr = ['@linearite/plugin-', 'linearite-plugin-', '']
-    let module: Plugin<N> | undefined
+    let module: Plugin<B> | undefined
     let error: Error | undefined
     for (const prefix of prefixArr) {
       try {
@@ -60,7 +68,8 @@ export interface Context<B> {
   [Context.events]: Events<this>
 }
 
-export class Context<B extends Builder.Types> extends cordis.Context<Context.Config<B>> {
+export class Context<B extends Builder.Types>
+  extends cordis.Context<Context.Config<B>> {
   constructor(
     public program: Command,
     options?: Context.Config<B>,
@@ -85,23 +94,39 @@ export class Context<B extends Builder.Types> extends cordis.Context<Context.Con
       }
     }
     if (typeof builderOpts === 'string') {
-      const plugin = Plugin.r(builderOpts as Builder.Types)
+      const plugin = Plugin.r(builderOpts as Plugin.Names)
       if (plugin.type !== 'builder') {
         throw new Error(`plugin ${builderOpts} is not a builder`)
       }
       plugin.call(this, plugin.conf)
     }
     if (typeof builderOpts === 'object') {
-      const plugin = Plugin.r(builderOpts.type)
+      const plugin = Plugin.r(`builder-${builderOpts.type}`)
       if (plugin.type !== 'builder') {
         throw new Error(`plugin ${builderOpts.type} is not a builder`)
       }
       plugin.call(this, builderOpts)
     }
-    program.command('build')
+    this.#command('build')
       .action(() => {
         console.log('build')
       })
+  }
+
+  public commands: Record<string, Command> = {}
+
+  command(name: string) {
+    if (name === 'build') {
+      // forbid register build command
+      throw new Error('build command is reserved')
+    }
+    return this.#command(name)
+  }
+
+  #command(name: string) {
+    const c = this.program.command(name)
+    this.commands[name] = c
+    return c
   }
 
   regiter(plugin: Plugin<any>) {
