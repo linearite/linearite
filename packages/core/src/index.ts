@@ -28,9 +28,12 @@ export namespace Linearite {
         | Linearite.Inherit
         | boolean
         | Builder.Types
-        | (Builder.Opts & Builder.Confs[
-          Builder.InferName<N>
-        ])
+        | (
+          & Omit<Builder.Opts, 'type'>
+          & Builder.Confs[
+            Builder.InferName<N>
+          ]
+        )
     }
   }
   type InferPluginConf<N extends Plugin.Names> = N extends keyof Plugin.Confs
