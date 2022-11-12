@@ -6,14 +6,21 @@ import { Builder } from './builder'
 
 export type Plugin<N extends Plugin.Names> = {
   type: string
-} & ({
-  name: N
-  call: (ctx: Context<N>) => void
-} | {
-  name: N extends `builder-${string}` ? N : never
-  conf: Linearite.Configuration<N>
-  call: (ctx: Context<N>, conf: Linearite.Configuration<N>['builder']) => void
-})
+} & (
+  | {
+    name: N
+    call: (ctx: Context<N>) => void
+  }
+  | (
+    N extends `builder-${Builder.Types}`
+      ? {
+        name: N
+        conf: Linearite.Configuration<N>['builder']
+        call: (ctx: Context<N>, conf: Linearite.Configuration<N>['builder']) => void
+      }
+      : never
+  )
+)
 
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
 

@@ -35,14 +35,16 @@ export namespace Linearite {
   }
   type InferPluginConf<N extends Plugin.Names> = N extends keyof Plugin.Confs
     ? Plugin.Confs[N]
+    // exclude builder
     : {}
-  export type Configuration<N extends Plugin.Names> = N extends N
-    ? Confs<N> extends { [K in keyof Confs<N> &InferPluginConf<N>]: infer V }
-      ? V extends object
-        ? V
-        : never
+  export type Configuration<N extends Plugin.Names> =
+    N extends N
+      ? N extends `builder-${Builder.Types}`
+        ? Confs<N>['builder']
+        : Confs<N> extends { [K in keyof Confs<N> & InferPluginConf<N>]: infer V }
+          ? V
+          : never
       : never
-    : never
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
