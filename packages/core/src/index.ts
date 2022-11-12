@@ -1,4 +1,5 @@
 import { Builder } from './builder'
+import { Plugin } from './context'
 
 export * from './builder'
 export * from './context'
@@ -17,28 +18,30 @@ export namespace Linearite {
     version: string
     description: string
   }
-  export interface Configuration<B extends Builder.Types> {
+  export interface Confs<N extends Plugin.Names> {
     /**
      * builder config
      */
-    builder?: Inherit | boolean | Builder.Types | (Builder.Opts & Builder.Confs[B])
-    /**
-     * auto with tag when publish package
-     *
-     * support {@link Linearite.MacroSytax} variables
-     *
-     * @default "${{L_NAME}}@${{PKG_VERSION}}"
-     */
-    autoTag?: Inherit | boolean | string | ((pkgMeta: PKGMeta, conf: this) => string)
-    /**
-     * check commit message
-     *
-     * @default true
-     */
-    cmMsgRule?: Inherit | boolean
+    builder?: {
+      matrix?: {}
+      builder?:
+        | Linearite.Inherit
+        | boolean
+        | Builder.Types
+        | (Builder.Opts & Builder.Confs[
+          Builder.InferName<N>
+        ])
+    }
   }
+  export type Configuration<N extends Plugin.Names> = N extends N
+    ? Confs<N> extends { [K in keyof Confs<N> & Plugin.Confs[N]]: infer V }
+      ? V extends object
+        ? V
+        : never
+      : never
+    : never
 }
 
-export const defineConfiguration = <B extends Builder.Types>(conf: Linearite.Configuration<B>) => conf
+export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
 
 export default Linearite
