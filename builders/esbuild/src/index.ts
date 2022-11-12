@@ -1,16 +1,16 @@
 import { definePlugin } from '@linearite/core'
 
 declare module '@linearite/core' {
-  export namespace Builder {
-    export interface Confs {
+  namespace Builder {
+    // @ts-ignore
+    interface Confs extends Builder.Confs {
       esbuild: {}
     }
   }
 }
 
 export default definePlugin({
-  name: 'esbuild',
-  type: 'builder',
+  name: 'builder-esbuild',
   conf: {
     target: ['node12'],
     format: ['umd', 'esm'],
