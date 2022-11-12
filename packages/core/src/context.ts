@@ -6,12 +6,13 @@ import { Builder } from './builder'
 
 export type Plugin<N extends Plugin.Names> = {
   type: string
-  name: N
 } & ({
-  type: 'command'
+  name: N
   call: (ctx: Context<N>) => void
 } | {
-  type: 'builder'
+  name: N extends `builder-${string}` ? N : never
+  conf: Linearite.Configuration<N>
+  call: (ctx: Context<N>, conf: Linearite.Configuration<N>['builder']) => void
 })
 
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
@@ -19,7 +20,13 @@ export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugi
 export namespace Plugin {
   export interface Confs {
   }
-  export type Names = keyof Confs
+  export type Names = keyof Confs | (
+    Builder.Types extends infer B
+      ? B extends string
+        ? `builder-${B}`
+        : never
+      : never
+  )
 }
 
 export interface Events<
@@ -33,7 +40,7 @@ export interface Context<N> {
   [Context.events]: Events<N, this>
 }
 
-export class Context<N extends Plugin.Names>
+export class Context<N extends Plugin.Names = Plugin.Names>
   extends cordis.Context<Context.Config<N>> {
   constructor(public program: Command, options?: Context.Config<N>) {
     super(options)
@@ -57,5 +64,10 @@ export class Context<N extends Plugin.Names>
 }
 
 export namespace Context {
-  export type Config<N extends Plugin.Names> = cordis.Context.Config & Linearite.Configuration<N>
+  export type Config<N extends Plugin.Names> =
+    & {}
+    | (
+      & cordis.Context.Config
+      & Linearite.Configuration<N>
+    )
 }
