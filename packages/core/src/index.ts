@@ -33,8 +33,11 @@ export namespace Linearite {
         ])
     }
   }
+  type InferPluginConf<N extends Plugin.Names> = N extends keyof Plugin.Confs
+    ? Plugin.Confs[N]
+    : {}
   export type Configuration<N extends Plugin.Names> = N extends N
-    ? Confs<N> extends { [K in keyof Confs<N> & Plugin.Confs[N]]: infer V }
+    ? Confs<N> extends { [K in keyof Confs<N> &InferPluginConf<N>]: infer V }
       ? V extends object
         ? V
         : never
