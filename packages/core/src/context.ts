@@ -5,16 +5,14 @@ import Linearite from './index'
 import { Builder } from './builder'
 
 export type Plugin<N extends Plugin.Names> = {
-  type: string
+  name: N
 } & (
   | {
-    name: N
     call: (ctx: Context<N>) => void
   }
   | (
     N extends `builder-${Builder.Types}`
       ? {
-        name: N
         conf: Linearite.Configuration<N>['builder']
         call: (ctx: Context<N>, conf: Linearite.Configuration<N>['builder']) => void
       }
