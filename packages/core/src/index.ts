@@ -19,7 +19,7 @@ export namespace Linearite {
     description: string
   }
   export type BuilderOpts<N extends Plugin.Names> =
-    & Omit<Builder.Opts, 'type'>
+    & Builder.Opts
     & Builder.Confs[
       Builder.InferName<N>
     ]
