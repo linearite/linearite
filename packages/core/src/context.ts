@@ -32,6 +32,15 @@ export namespace Plugin {
         : never
       : never
   )
+  export function r<N extends Names>(n: N) {
+    const l = ['@linearite/plugin-', 'linearite-plugin-', '']
+    for (const p of l) {
+      try {
+        return require(`${p}${n}`).default as Plugin<N>
+      } catch {}
+    }
+    throw new Error(`plugin ${n} not found`)
+  }
 }
 
 export interface Events<
