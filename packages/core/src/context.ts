@@ -39,7 +39,7 @@ export namespace Plugin {
     }
     throw new Error(`plugin ${n} not found`)
   }
-  export function isBuilder<N extends Builders>(p: Plugin<N>): p is BuilderPlugin<N> {
+  export function isBuilder<N extends Names>(p: Plugin<N>): p is BuilderPlugin<N> {
     return p.name.startsWith('builder-')
   }
 }
