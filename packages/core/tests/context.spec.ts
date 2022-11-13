@@ -16,4 +16,13 @@ describe('context', function () {
     expect(ctx.commands['build'])
       .to.be.an.instanceOf(Command)
   })
+  it('should init context with custom build command', () => {
+    Context.defaultBuilder = 'dts'
+    const ctx = new Context(new Command('line-test'), { builder: 'inherit' })
+    expect(ctx).to.be.an.instanceOf(Context)
+    expect(ctx.commands['build'])
+      .to.be.an.instanceOf(Command)
+    expect(Object.keys(ctx.plugins))
+      .to.include('builder-dts')
+  })
 })
