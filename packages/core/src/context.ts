@@ -25,13 +25,10 @@ export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugi
 export namespace Plugin {
   export interface Confs {
   }
-  export type Names = keyof Confs | (
-    Builder.Types extends infer B
-      ? B extends string
-        ? `builder-${B}`
-        : never
-      : never
-  )
+  export type Builders = Builder.Types extends (infer B extends string)
+    ? `builder-${B}`
+    : never
+  export type Names = keyof Confs | Builders
   export function r<N extends Names>(n: N) {
     const l = ['@linearite/plugin-', 'linearite-plugin-', '']
     for (const p of l) {
@@ -64,7 +61,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
     this.initBuild(program, options)
   }
 
-  initBuild(program: Command, options?: Context.Config<`builder-${Builder.Types}`>) {
+  initBuild(program: Command, options?: Context.Config<Plugin.Builders>) {
     let builderType: Builder.Types | undefined
     if (Linearite.isInherit(options?.builder)) {
       builderType = Context.defaultBuilder
