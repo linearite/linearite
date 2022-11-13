@@ -56,12 +56,19 @@ export interface Context<N> {
 
 export class Context<N extends Plugin.Names = Plugin.Names>
   extends cordis.Context<Context.Config<N>> {
+
+  static defaultBuilder: Builder.Types = 'esbuild'
+
   constructor(public program: Command, options?: Context.Config<N>) {
     super(options)
     this.initBuild(program, options)
   }
 
-  initBuild(program: Command, options?: Context.Config<N>) {
+  initBuild(program: Command, options?: Context.Config<`builder-${Builder.Types}`>) {
+    let builderType: Builder.Types | undefined
+    if (Linearite.isInherit(options?.builder)) {
+      builderType = Context.defaultBuilder
+    }
     program
       .command('build')
       .action(() => {
