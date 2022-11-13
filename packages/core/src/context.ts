@@ -4,20 +4,21 @@ import type { Command } from 'commander'
 import Linearite from './index'
 import { Builder } from './builder'
 
+export type BuilderPlugin<N extends Plugin.Names> = N extends `builder-${Builder.Types}`
+  ? {
+    name: N
+    conf: Omit<Linearite.BuilderOpts<N>, 'type'>
+    call: (ctx: Context<N>, conf: Omit<Linearite.BuilderOpts<N>, 'type'>) => void
+  }
+  : never
+
 export type Plugin<N extends Plugin.Names> = {
   name: N
 } & (
   | {
     call: (ctx: Context<N>) => void
   }
-  | (
-    N extends `builder-${Builder.Types}`
-      ? {
-        conf: Linearite.BuilderOpts<N>
-        call: (ctx: Context<N>, conf: Linearite.BuilderOpts<N>) => void
-      }
-      : never
-  )
+  | BuilderPlugin<N>
 )
 
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
@@ -37,6 +38,9 @@ export namespace Plugin {
       } catch {}
     }
     throw new Error(`plugin ${n} not found`)
+  }
+  export function isBuilder<N extends Builders>(p: Plugin<N>): p is BuilderPlugin<N> {
+    return p.name.startsWith('builder-')
   }
 }
 
@@ -65,15 +69,32 @@ export class Context<N extends Plugin.Names = Plugin.Names>
     if (!options.builder)
       return
 
+    let isInherit = Linearite.isInherit(options.builder)
     let builderType: Builder.Types | undefined
-    if (Linearite.isInherit(options.builder)) {
+    if (isInherit) {
       builderType = Context.defaultBuilder
     }
-    program
-      .command('build')
-      .action(() => {
-        console.log()
-      })
+    if (typeof options.builder === 'object') {
+      builderType = options.builder.type
+    }
+    const builder = Plugin.r(`builder-${builderType}`)
+    if (Plugin.isBuilder(builder)) {
+      const builderOpts = isInherit
+        ? builder.conf
+        : typeof options.builder === 'object'
+          ? options.builder
+          : builder.conf
+
+      // @ts-ignore
+      builder.call(this, builderOpts)
+      program
+        .command('build')
+        .action(() => {
+          console.log('trigger build')
+          // this.emit('build', workspace)
+        })
+    } else
+      throw new Error(`"builder-${builderType}" is not a builder plugin`)
   }
 
   public commands: Record<string, Command> = {}
