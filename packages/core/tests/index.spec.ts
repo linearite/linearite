@@ -13,12 +13,8 @@ describe('core', function () {
   it('should test defineConfiguration function', () => {
     expect(defineConfiguration({
       builder: true,
-      autoTag: true,
-      cmMsgRule: true
     })).to.be.deep.equal({
       builder: true,
-      autoTag: true,
-      cmMsgRule: true
     })
   })
 })
