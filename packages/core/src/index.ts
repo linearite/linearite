@@ -1,6 +1,8 @@
 import { Builder } from './builder'
 import { Plugin } from './context'
+import { U2I } from './type'
 
+export * from './type'
 export * from './builder'
 export * from './context'
 
@@ -37,14 +39,15 @@ export namespace Linearite {
       builder?: BuilderProp<N>
     }
   }
-  export type Configuration<N extends Plugin.Names> =
+  export type Configuration<N extends Plugin.Names> = U2I<
     N extends N
       ? N extends Plugin.Builders
         ? Confs<N>['builder']
-      : N extends keyof Plugin.Confs
-        ? Plugin.Confs[N]
+        : N extends keyof Plugin.Confs
+          ? Plugin.Confs[N]
+          : never
       : never
-      : never
+  >
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
