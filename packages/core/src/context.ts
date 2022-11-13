@@ -86,9 +86,6 @@ export class Context<N extends Plugin.Names = Plugin.Names>
 
 export namespace Context {
   export type Config<N extends Plugin.Names> =
-    & {}
-    | (
-      & cordis.Context.Config
-      & Linearite.Configuration<N>
-    )
+    & cordis.Context.Config
+    & Linearite.Configuration<N>
 }
