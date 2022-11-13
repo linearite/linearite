@@ -5,7 +5,9 @@ export namespace Builder {
   /**
    * declare module '@linearite/core' {
    *   export namespace Builder {
-   *     export interface Confs {
+   *     // ignore recusive type error, because it is work
+   *     // @ts-ignore
+   *     export interface Confs extends Confs {
    *       name: SpecialConf
    *     }
    *   }
