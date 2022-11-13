@@ -48,11 +48,32 @@ export interface Events<
   N extends Plugin.Names,
   C extends Context<N> = Context<N>
 > extends cordis.Events<C> {
+  /**
+   * supplement cli package, builder plugin is not care about this event
+   *
+   * @param workspaces
+   */
+  'build'(workspaces?: string[]): void
 }
 
 export interface Context<N> {
   [Context.config]: Context.Config<N>
   [Context.events]: Events<N, this>
+}
+
+/**
+ * @internal
+ */
+const CommandSymbol = Symbol('command')
+
+function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Context<N>) {
+  ctx
+    [CommandSymbol]('build')
+    .action(async (options: {
+      workspaces?: string[]
+    }) => {
+      await ctx.parallel('build', options.workspaces)
+    })
 }
 
 export class Context<N extends Plugin.Names = Plugin.Names>
@@ -87,12 +108,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
 
       // @ts-ignore
       builder.call(this, builderOpts)
-      program
-        .command('build')
-        .action(() => {
-          console.log('trigger build')
-          // this.emit('build', workspace)
-        })
+      registerBuildCommand(this)
     } else
       throw new Error(`"builder-${builderType}" is not a builder plugin`)
   }
@@ -104,11 +120,13 @@ export class Context<N extends Plugin.Names = Plugin.Names>
       // forbid register build command
       throw new Error('build command is reserved')
     }
-    return this.#command(name)
+    return this[CommandSymbol](name)
   }
 
-  #command(name: string) {
-    return this.commands[name] = this.program.command(name)
+  [CommandSymbol](name: string) {
+    return this.commands[name] = this.program
+      .command(name)
+      .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
   }
 }
 
