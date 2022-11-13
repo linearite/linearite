@@ -69,6 +69,11 @@ export interface Context<N> {
  */
 const CommandSymbol = Symbol('command')
 
+/**
+ * @internal
+ */
+const RegisterSymbol = Symbol('register')
+
 function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Context<N>) {
   ctx
     [CommandSymbol]('build')
@@ -112,6 +117,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
       // @ts-ignore
       builder.call(this, builderOpts)
       registerBuildCommand(this)
+      this[RegisterSymbol](builder)
     } else
       throw new Error(`"builder-${builderType}" is not a builder plugin`)
   }
@@ -132,10 +138,22 @@ export class Context<N extends Plugin.Names = Plugin.Names>
       .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
   }
 
+  public plugins: Record<string, Plugin<Plugin.Names>> = {}
+
   register<N extends Plugin.Names>(plugin: Plugin<N>) {
     if (Plugin.isBuilder(plugin)) {
       // forbid register builder plugin
       throw new Error('builder plugin is reserved')
+    }
+    this[RegisterSymbol](plugin)
+  }
+
+  [RegisterSymbol]<N extends Plugin.Names>(plugin: Plugin<N>) {
+    // @ts-ignore
+    this.plugins[plugin.name] = plugin
+
+    if (Plugin.isBuilder(plugin)) {
+      return
     }
     if (Plugin.isNotBuilder(plugin)) {
       plugin.call(this as any)
