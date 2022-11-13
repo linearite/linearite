@@ -13,8 +13,8 @@ export type Plugin<N extends Plugin.Names> = {
   | (
     N extends `builder-${Builder.Types}`
       ? {
-        conf: Linearite.Configuration<N>['builder']
-        call: (ctx: Context<N>, conf: Linearite.Configuration<N>['builder']) => void
+        conf: Linearite.BuilderOpts<N>
+        call: (ctx: Context<N>, conf: Linearite.BuilderOpts<N>) => void
       }
       : never
   )
@@ -49,6 +49,15 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   extends cordis.Context<Context.Config<N>> {
   constructor(public program: Command, options?: Context.Config<N>) {
     super(options)
+    this.initBuild(program, options)
+  }
+
+  initBuild(program: Command, options?: Context.Config<N>) {
+    program
+      .command('build')
+      .action(() => {
+        console.log()
+      })
   }
 
   public commands: Record<string, Command> = {}
