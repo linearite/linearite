@@ -62,9 +62,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   }
 
   #command(name: string) {
-    const c = this.program.command(name)
-    this.commands[name] = c
-    return c
+    return this.commands[name] = this.program.command(name)
   }
 }
 
