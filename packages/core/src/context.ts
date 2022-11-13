@@ -62,8 +62,11 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   }
 
   initBuild(program: Command, options?: Context.Config<Plugin.Builders>) {
+    if (!options.builder)
+      return
+
     let builderType: Builder.Types | undefined
-    if (Linearite.isInherit(options?.builder)) {
+    if (Linearite.isInherit(options.builder)) {
       builderType = Context.defaultBuilder
     }
     program
