@@ -5,7 +5,9 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@linearite/*": ["./packages/*/src"]
+      "@linearite/*": ["./packages/*/src"],
+      "@linearite/plugin-*": ["./plugins/*/src"],
+      "@linearite/plugin-builder-*": ["./builders/*/src"]
     }
   },
   "exclude": ["node_modules"]
