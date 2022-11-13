@@ -42,6 +42,9 @@ export namespace Plugin {
   export function isBuilder<N extends Names>(p: Plugin<N>): p is BuilderPlugin<N> {
     return p.name.startsWith('builder-')
   }
+  export function isNotBuilder<N extends Names>(p: Plugin<N>): p is Exclude<Plugin<N>, BuilderPlugin<N>> {
+    return !isBuilder(p)
+  }
 }
 
 export interface Events<
@@ -127,6 +130,16 @@ export class Context<N extends Plugin.Names = Plugin.Names>
     return this.commands[name] = this.program
       .command(name)
       .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
+  }
+
+  register<N extends Plugin.Names>(plugin: Plugin<N>) {
+    if (Plugin.isBuilder(plugin)) {
+      // forbid register builder plugin
+      throw new Error('builder plugin is reserved')
+    }
+    if (Plugin.isNotBuilder(plugin)) {
+      plugin.call(this as any)
+    }
   }
 }
 
