@@ -18,22 +18,23 @@ export namespace Linearite {
     version: string
     description: string
   }
+  export type BuilderOpts<N extends Plugin.Names> =
+    & Omit<Builder.Opts, 'type'>
+    & Builder.Confs[
+      Builder.InferName<N>
+    ]
+  export type BuilderProp<N extends Plugin.Names> =
+    | Linearite.Inherit
+    | boolean
+    | Builder.Types
+    | BuilderOpts<N>
   export interface Confs<N extends Plugin.Names> {
     /**
      * builder config
      */
     builder?: {
       matrix?: {}
-      builder?:
-        | Linearite.Inherit
-        | boolean
-        | Builder.Types
-        | (
-          & Omit<Builder.Opts, 'type'>
-          & Builder.Confs[
-            Builder.InferName<N>
-          ]
-        )
+      builder?: BuilderProp<N>
     }
   }
   type InferPluginConf<N extends Plugin.Names> = N extends keyof Plugin.Confs
