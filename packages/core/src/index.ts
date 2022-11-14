@@ -43,9 +43,9 @@ export namespace Linearite {
     N extends N
       ? N extends Plugin.Builders
         ? Confs<N>['builder']
-        : N extends keyof Plugin.Confs
-          ? Plugin.Confs[N]
-          : never
+      : N extends keyof Plugin.Confs
+        ? Plugin.Confs[N]
+      : never
       : never
   >
 }
