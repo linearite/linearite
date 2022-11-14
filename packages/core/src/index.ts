@@ -20,30 +20,25 @@ export namespace Linearite {
     version: string
     description: string
   }
-  export type BuilderOpts<N extends Plugin.Names> =
-    & Builder.Opts
-    & Builder.Confs[
-      Builder.InferName<N>
-    ]
-  export type BuilderProp<N extends Plugin.Names> =
-    | Linearite.Inherit
-    | boolean
-    | Builder.Types
-    | BuilderOpts<N>
-  export interface Confs<N extends Plugin.Names> {
+  export type Configuration<N extends Plugin.Names> = {
+    matrix?: {}
     /**
      * builder config
      */
-    builder?: {
-      matrix?: {}
-      builder?: BuilderProp<N>
-    }
-  }
-  export type Configuration<N extends Plugin.Names> = U2I<
+    builder?:
+      | Linearite.Inherit
+      | boolean
+      | Builder.Types
+      | Builder.Opts & U2I<
+        N extends N
+          ? N extends Plugin.Builders
+            ? Builder.Confs[Builder.InferName<N>]
+          : never
+          : never
+      >
+  } & U2I<
     N extends N
-      ? N extends Plugin.Builders
-        ? Confs<N>['builder']
-      : N extends keyof Plugin.Confs
+      ? N extends keyof Plugin.Confs
         ? Plugin.Confs[N]
       : never
       : never
