@@ -20,6 +20,7 @@ export namespace Linearite {
     version: string
     description: string
   }
+  export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
     matrix?: {}
     /**
