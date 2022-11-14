@@ -102,6 +102,10 @@ export class Context<N extends Plugin.Names = Plugin.Names>
     let builderType: Builder.Types | undefined
     if (isInherit) {
       builderType = Context.defaultBuilder
+    } else {
+      if (typeof options.builder === 'string') {
+        builderType = options.builder as Builder.Types
+      }
     }
     if (typeof options.builder === 'object') {
       builderType = options.builder.type
