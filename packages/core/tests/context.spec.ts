@@ -18,11 +18,18 @@ describe('context', function () {
   })
   it('should init context with custom build command', () => {
     Context.defaultBuilder = 'dts'
-    const ctx = new Context(new Command('line-test'), { builder: 'inherit' })
-    expect(ctx).to.be.an.instanceOf(Context)
-    expect(ctx.commands['build'])
+    const ctx0 = new Context(new Command('line-test'), { builder: 'inherit' })
+    expect(ctx0).to.be.an.instanceOf(Context)
+    expect(ctx0.commands['build'])
       .to.be.an.instanceOf(Command)
-    expect(Object.keys(ctx.plugins))
+    expect(Object.keys(ctx0.plugins))
       .to.include('builder-dts')
+
+    const ctx1 = new Context(new Command('line-test'), { builder: 'esbuild' })
+    expect(ctx1).to.be.an.instanceOf(Context)
+    expect(ctx1.commands['build'])
+      .to.be.an.instanceOf(Command)
+    expect(Object.keys(ctx1.plugins))
+      .to.include('builder-esbuild')
   })
 })
