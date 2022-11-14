@@ -4,11 +4,13 @@ import type { Command } from 'commander'
 import Linearite from './index'
 import { Builder } from './builder'
 
+type BuilderPluginConf<N extends Plugin.Names> = Omit<Builder.Configuration<N>, 'type'>
+
 export type BuilderPlugin<N extends Plugin.Names> = N extends `builder-${Builder.Types}`
   ? {
     name: N
-    conf: Omit<Linearite.BuilderOpts<N>, 'type'>
-    call: (ctx: Context<N>, conf: Omit<Linearite.BuilderOpts<N>, 'type'>) => void
+    conf: BuilderPluginConf<N>
+    call: (ctx: Context<N>, conf: BuilderPluginConf<N>) => void
   }
   : never
 

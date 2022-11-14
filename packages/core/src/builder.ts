@@ -26,4 +26,7 @@ export namespace Builder {
     external?: string[]
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
+  export type Configuration<N extends Plugin.Names> =
+    & Opts
+    & Confs[InferName<N>]
 }
