@@ -5,5 +5,6 @@
     "line": "bin/linearite.js"
   },
   "dependencies": {
+    "commander": "^9.4.1"
   }
 }
