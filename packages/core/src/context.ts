@@ -86,9 +86,9 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
     .option('-w, --watch', 'watch file change')
     .action(async (options: {
       watch: boolean
-      workspaces?: string[]
+      workspaces?: string
     }) => {
-      await ctx.parallel('build', options.workspaces, {
+      await ctx.parallel('build', options.workspaces.split(','), {
         isWatch: options.watch
       })
     })
