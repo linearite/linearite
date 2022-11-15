@@ -55,10 +55,13 @@ export interface Events<
 > extends cordis.Events<C> {
   /**
    * supplement cli package, builder plugin is not care about this event
-   *
-   * @param workspaces
    */
-  'build'(workspaces?: string[]): void
+  'build'(workspaces?: string[], opts?: {
+    /**
+     * tell build plugin need watch file change
+     */
+    isWatch?: boolean
+  }): void
 }
 
 export interface Context<N> {
@@ -79,10 +82,15 @@ const RegisterSymbol = Symbol('register')
 function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Context<N>) {
   ctx
     [CommandSymbol]('build')
+    .description('build workspaces')
+    .option('-w, --watch', 'watch file change')
     .action(async (options: {
+      watch: boolean
       workspaces?: string[]
     }) => {
-      await ctx.parallel('build', options.workspaces)
+      await ctx.parallel('build', options.workspaces, {
+        isWatch: options.watch
+      })
     })
 }
 
