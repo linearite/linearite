@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as fs from 'fs'
+import * as path from 'path'
 
 import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
@@ -20,16 +21,16 @@ function getConfPath() {
 }
 
 function getConf() {
-  const path = getConfPath()
-  if (path.endsWith('.ts')) {
-    require('ts-node').register()
+  const confPath = getConfPath()
+  if (confPath.endsWith('.ts')) {
+    require('esbuild-register/dist/node').register()
   }
-  const conf = require
-    .resolve(path)
-    .split('/')
-    .slice(0, -1)
-    .join('/')
-  return require(conf).default
+  return require(
+    path.resolve(
+      process.cwd(),
+      confPath
+    )
+  ).default
 }
 
 async function main() {
