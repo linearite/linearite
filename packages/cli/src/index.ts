@@ -30,8 +30,7 @@ function getConfPath() {
   return target
 }
 
-function getConf() {
-  const confPath = getConfPath()
+function getConf(confPath?: string) {
   if (confPath.endsWith('.ts')) {
     require('esbuild-register/dist/node').register()
   }
@@ -48,8 +47,18 @@ async function main() {
 
   program
     .version('0.0.1')
+    .option('-c, --conf <path>', 'config file path', getConfPath())
 
-  const conf = getConf()
+  /**
+   * parse program global options
+   */
+  program.parseOptions(process.argv.slice(2))
+
+  const {
+    conf: confPath,
+  } = program.opts()
+
+  const conf = getConf(confPath)
   const context = new Context(program, conf)
 
   Object
