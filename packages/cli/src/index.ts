@@ -4,6 +4,16 @@ import * as path from 'path'
 
 import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
+
+declare module '@linearite/core' {
+  export interface Events<
+    N extends Plugin.Names,
+    C extends Context<N> = Context<N>
+  > {
+    'build:item'(workspace: string, opts?: Parameters<Events<N, C>['build']>[1]): void
+  }
+}
+
 const { InnerConfKeys } = Linearite
 
 const CONF_PATH = process.env.LINEARITE_CONF_PATH
@@ -41,6 +51,7 @@ async function main() {
 
   const conf = getConf()
   const context = new Context(program, conf)
+
   Object
     .keys(conf)
     .filter(k => !InnerConfKeys.includes(k as typeof InnerConfKeys[number]))
@@ -52,6 +63,13 @@ async function main() {
         console.error(e)
         console.warn(`you can use \`linearite plugin ${k}\` to install plugin`)
       }
+    })
+
+  context
+    .on('build', (workspaces, opts) => {
+      return Promise.all(workspaces?.map(async workspace => {
+        await context.parallel('build:item', workspace, opts)
+      }))
     })
 
   program.parse()
