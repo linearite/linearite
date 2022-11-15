@@ -22,7 +22,6 @@ export namespace Linearite {
   }
   export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
-    matrix?: {}
     /**
      * builder config
      */
@@ -37,13 +36,7 @@ export namespace Linearite {
           : never
           : never
       >
-  } & U2I<
-    N extends N
-      ? N extends keyof Plugin.Confs
-        ? Plugin.Confs[N]
-      : never
-      : never
-  >
+  } & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
