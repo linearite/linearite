@@ -43,7 +43,7 @@ async function main() {
   const context = new Context(program, conf)
   Object
     .keys(conf)
-    .filter(k => InnerConfKeys.includes(k as typeof InnerConfKeys[number]))
+    .filter(k => !InnerConfKeys.includes(k as typeof InnerConfKeys[number]))
     .forEach(k => {
       try {
         const plugin = Plugin.r(k as Plugin.Names)
