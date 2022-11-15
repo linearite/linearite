@@ -56,7 +56,7 @@ export interface Events<
   /**
    * supplement cli package, builder plugin is not care about this event
    */
-  'build'(workspaces?: string[], opts?: {
+  'build'(opts?: {
     /**
      * tell build plugin need watch file change
      */
@@ -86,9 +86,8 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
     .option('-w, --watch', 'watch file change')
     .action(async (options: {
       watch: boolean
-      workspaces?: string
     }) => {
-      await ctx.parallel('build', options.workspaces.split(','), {
+      await ctx.parallel('build', {
         isWatch: options.watch
       })
     })
@@ -149,7 +148,6 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   [CommandSymbol](name: string) {
     return this.commands[name] = this.program
       .command(name)
-      .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
   }
 
   public plugins: Record<string, Plugin<Plugin.Names>> = {}

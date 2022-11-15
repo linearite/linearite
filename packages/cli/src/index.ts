@@ -10,7 +10,7 @@ declare module '@linearite/core' {
     N extends Plugin.Names,
     C extends Context<N> = Context<N>
   > {
-    'build:item'(workspace: string, opts?: Parameters<Events<N, C>['build']>[1]): void
+    'build:item'(workspace: string, opts?: Parameters<Events<N, C>['build']>[0]): void
   }
 }
 
@@ -48,6 +48,7 @@ async function main() {
   program
     .version('0.0.1')
     .option('-c, --conf <path>', 'config file path', getConfPath())
+    .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
 
   /**
    * parse program global options
@@ -56,7 +57,13 @@ async function main() {
 
   const {
     conf: confPath,
-  } = program.opts()
+    workspaces: workspacesOpt,
+  } = program.opts<{
+    conf: string
+    workspaces: string
+  }>()
+
+  const workspaces = workspacesOpt?.split(',').map(w => w.trim()) ?? []
 
   const conf = getConf(confPath)
   const context = new Context(program, conf)
@@ -75,7 +82,7 @@ async function main() {
     })
 
   context
-    .on('build', (workspaces, opts) => {
+    .on('build', (opts) => {
       return Promise.all(workspaces?.map(async workspace => {
         await context.parallel('build:item', workspace, opts)
       }))
