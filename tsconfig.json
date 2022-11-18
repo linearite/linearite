@@ -4,6 +4,7 @@
     "target": "ESNext",
     "sourceMap": true,
     "baseUrl": ".",
+    "esModuleInterop": true,
     "paths": {
       "@linearite/*": ["./packages/*/src"],
       "@linearite/plugin-*": ["./plugins/*/src"],
