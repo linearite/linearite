@@ -10,7 +10,7 @@ declare module '@linearite/core' {
        *
        * @default "${{L_NAME}}@${{PKG_VERSION}}"
        */
-      'tag': Linearite.Inherit | boolean | string | ((pkgMeta: Linearite.PKGMeta) => string)
+      'tag': Linearite.Inherit | boolean | string | ((workspaces: Linearite.Workspace[]) => string)
     }
   }
 }

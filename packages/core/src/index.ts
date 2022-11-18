@@ -15,10 +15,12 @@ export namespace Linearite {
   export function isInherit(v: any): v is 'inherit' {
     return ['auto', 'inherit', true].includes(v)
   }
-  export interface PKGMeta {
+  export interface Workspace {
     name: string
     version: string
     description: string
+    dependencies: Record<string, string>
+    devDependencies: Record<string, string>
   }
   export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
