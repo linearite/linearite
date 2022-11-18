@@ -14,13 +14,15 @@ declare module '@linearite/core' {
 
 export async function treeDirPaths(dir: string) {
   const paths = await fs.promises.readdir(dir)
-  const dirs = await Promise.all(paths
-    .map(async p => {
-      const stat = await fs.promises.stat(path.resolve(dir, p))
-      return stat.isDirectory() ? p : null
-    })
-    .filter(Boolean)
+  const dirs = (
+    await Promise.all(paths
+      .map(async p => {
+        const stat = await fs.promises.stat(path.resolve(dir, p))
+        return stat.isDirectory() ? p : null
+      })
+    )
   )
+    .filter(Boolean)
   await Promise.all(dirs.map(async d => {
     dirs.push(...await treeDirPaths(path.resolve(dir, d)))
   }))
