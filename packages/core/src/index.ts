@@ -16,11 +16,14 @@ export namespace Linearite {
     return ['auto', 'inherit', true].includes(v)
   }
   export interface Workspace {
-    name: string
-    version: string
-    description: string
-    dependencies: Record<string, string>
-    devDependencies: Record<string, string>
+    meta: {
+      name: string
+      version: string
+      description: string
+      dependencies: Record<string, string>
+      devDependencies: Record<string, string>
+    }
+    dir: string
   }
   export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
