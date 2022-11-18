@@ -4,7 +4,11 @@
   "bin": {
     "line": "bin/linearite.js"
   },
+  "devDependencies": {
+    "@types/minimatch": "^5.1.2"
+  },
   "dependencies": {
-    "commander": "^9.4.1"
+    "commander": "^9.4.1",
+    "minimatch": "^5.1.0"
   }
 }
