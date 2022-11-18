@@ -5,7 +5,7 @@ import * as path from 'path'
 import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
 
-import './workspaces'
+import { store, initWorkspaces } from './workspaces'
 
 declare module '@linearite/core' {
   export interface Events<
@@ -69,6 +69,8 @@ async function main() {
 
   const conf = getConf(confPath)
   const context = new Context(program, conf)
+
+  await initWorkspaces(store)
 
   Object
     .keys(conf)

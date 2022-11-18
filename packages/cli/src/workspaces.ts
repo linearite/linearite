@@ -35,6 +35,8 @@ export async function treeDirPaths(dir: string, opts = {
   return dirs
 }
 
+export const store: Record<string, Workspace> = {}
+
 export async function initWorkspaces(store: Record<string, Workspace>) {
   const root = process.cwd()
   const workspaceMeta = JSON.parse(
@@ -69,13 +71,6 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
 
 Context.service('workspaces', class {
   constructor(root: Context) {
-    const store: Record<string, Workspace> = {}
-    initWorkspaces(store)
-      .catch(e => {
-        console.error(e)
-        process.exit(1)
-      })
-
     return new Proxy({} as Workspaces, {
       get(target, key) {
         const keys = Object.keys(store)
