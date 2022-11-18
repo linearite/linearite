@@ -90,7 +90,12 @@ async function main() {
       }))
     })
 
-  program.parse()
+  context
+    .on('ready', () => {
+      program.parse()
+    })
+
+  await context.start()
 }
 
 main()

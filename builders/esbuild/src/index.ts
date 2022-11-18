@@ -16,5 +16,11 @@ export default definePlugin({
     format: ['umd', 'esm'],
   },
   call: (ctx, conf) => {
+    ctx.on('build:item', (workspace, opts) => {
+      console.log(
+        [...ctx.workspaces]
+      )
+      console.log('build:item', workspace, opts)
+    })
   }
 })
