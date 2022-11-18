@@ -4,6 +4,9 @@
   "bin": {
     "line": "bin/linearite.js"
   },
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "devDependencies": {
     "@types/minimatch": "^5.1.2"
   },
