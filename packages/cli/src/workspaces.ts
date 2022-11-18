@@ -12,11 +12,16 @@ declare module '@linearite/core' {
   }
 }
 
-export async function treeDirPaths(dir: string) {
+export async function treeDirPaths(dir: string, opts = {
+  exclude: ['node_modules', '.git'],
+}) {
   const paths = await fs.promises.readdir(dir)
   const dirs = (
     await Promise.all(paths
       .map(async p => {
+        if (opts.exclude.includes(p)) {
+          return null
+        }
         const stat = await fs.promises.stat(path.resolve(dir, p))
         return stat.isDirectory() ? p : null
       })
