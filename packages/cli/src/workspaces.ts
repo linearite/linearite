@@ -29,7 +29,8 @@ export async function treeDirPaths(dir: string, opts = {
   )
     .filter(Boolean)
   await Promise.all(dirs.map(async d => {
-    dirs.push(...await treeDirPaths(path.resolve(dir, d)))
+    const subPaths = await treeDirPaths(path.resolve(dir, d), opts)
+    dirs.push(...subPaths.map(p => path.join(d, p)))
   }))
   return dirs
 }
