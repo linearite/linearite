@@ -5,6 +5,8 @@ import * as path from 'path'
 import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
 
+import './workspaces'
+
 declare module '@linearite/core' {
   export interface Events<
     N extends Plugin.Names,
