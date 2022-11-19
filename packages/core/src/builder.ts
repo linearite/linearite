@@ -1,6 +1,5 @@
 import { Plugin } from './context'
 import Linearite from './index'
-import Workspace = Linearite.Workspace
 
 export namespace Builder {
   export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
@@ -40,7 +39,7 @@ export namespace Builder {
      *
      * '[outdir]/index.[format]'
      */
-    outfile?: string | ((outdir: string, format: Format, workspace: Workspace) => string)
+    outfile?: string | ((outdir: string, format: Format, workspace: Linearite.Workspace) => string)
     define?: Record<string, string>
     minify?: boolean
     external?: string[]
