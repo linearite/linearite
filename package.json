@@ -9,7 +9,9 @@
     "builders/*",
     "plugins/*"
   ],
-  "scripts": {},
+  "scripts": {
+    "cli": "node -r esbuild-register packages/cli/src/index.ts"
+  },
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.3.3",
