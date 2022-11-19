@@ -1,6 +1,8 @@
 import { Plugin } from './context'
 import Linearite from './index'
 
+export interface BuilderConfs {}
+
 export namespace Builder {
   export type Platform = 'browser' | 'node' | 'neutral'
   export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
@@ -15,7 +17,7 @@ export namespace Builder {
    *   }
    * }
    */
-  export interface Confs {}
+  export interface Confs extends BuilderConfs {}
   export type Types = keyof Confs
   export type InferName<N extends Plugin.Names> = N extends `builder-${infer B extends Types}`
     ? B : never

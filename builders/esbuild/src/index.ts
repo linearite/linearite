@@ -1,14 +1,12 @@
 import path from 'path'
 
 import { build } from 'esbuild'
-import { Builder, definePlugin } from '@linearite/core'
+import { Builder, BuilderConfs, definePlugin } from '@linearite/core'
 
 declare module '@linearite/core' {
-  namespace Builder {
-    // @ts-ignore
-    interface Confs extends Builder.Confs {
-      esbuild: {}
-    }
+  // @ts-ignore
+  interface BuilderConfs extends BuilderConfs {
+    esbuild: {}
   }
 }
 

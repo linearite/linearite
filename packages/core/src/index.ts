@@ -1,4 +1,4 @@
-import { Builder } from './builder'
+import { Builder, BuilderConfs } from './builder'
 import { Plugin } from './context'
 import { U2I } from './type'
 
@@ -52,7 +52,7 @@ export namespace Linearite {
       | Builder.Opts & U2I<
         N extends N
           ? N extends Plugin.Builders
-            ? Builder.Confs[Builder.InferName<N>]
+            ? BuilderConfs[Builder.InferName<N>]
           : never
           : never
       >
