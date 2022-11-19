@@ -25,7 +25,7 @@ export namespace Linearite {
     }
     path: string
   }
-  export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
+  export const InnerConfKeys = ['scope', 'matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
     /**
      * scope of workspace, support multi scope
