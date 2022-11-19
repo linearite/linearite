@@ -9,11 +9,13 @@
   },
   "devDependencies": {
     "@types/minimatch": "^5.1.2",
+    "@types/inquirer": "^9.0.3",
     "@types/mock-fs": "^4.13.1",
     "mock-fs": "^4.13.0"
   },
   "dependencies": {
     "commander": "^9.4.1",
+    "inquirer": "^9.1.4",
     "minimatch": "^5.1.0"
   }
 }
