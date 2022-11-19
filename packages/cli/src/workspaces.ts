@@ -74,7 +74,11 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
   const workspaces = promiseResults
     .map(r => {
       if (r.status === 'rejected') {
-        console.warn(r)
+        if (r.reason instanceof Error) {
+          console.warn(r.reason.message)
+        } else {
+          console.error(r.reason)
+        }
       }
       return r
     })
