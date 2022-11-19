@@ -3,7 +3,7 @@ import type FileSystem from 'mock-fs/lib/filesystem'
 import { expect } from 'chai'
 import Linearite from '@linearite/core'
 
-import { createWorkspacesService, initWorkspaces, store } from '../src/workspaces'
+import { initWorkspaces, INNER, store } from '../src/workspaces'
 
 function createWorkspace(pkg: Linearite.Workspace['meta']) {
   return {
@@ -18,6 +18,7 @@ describe('Workspaces', function () {
       workspaces: ['packages/*', 'plugins/*']
     })
   }
+  let innerS = store[INNER]
   it('should init workspaces', async () => {
     mock({
       ...common,
@@ -37,9 +38,9 @@ describe('Workspaces', function () {
         })
       }), {})
     })
-    expect(store).to.be.empty
-    await initWorkspaces(store)
-    expect(Object.keys(store))
+    expect(innerS).to.be.empty
+    await initWorkspaces()
+    expect(Object.keys(innerS))
       .to.have.lengthOf(6)
       .and.to.include.members([
         '@test/foo',
@@ -61,15 +62,14 @@ describe('Workspaces', function () {
         })
       }), {})
     })
-    await initWorkspaces(store)
-    expect(store['@test/foo']).to.be.an('object')
-    expect(store['@test/foo']).to.have.property('meta')
-    expect(store['@test/foo'].meta).to.have.property('name', '@test/foo')
-    expect(store['@test/foo']).to.have.property('path', 'packages/foo')
+    await initWorkspaces()
+    expect(innerS['@test/foo']).to.be.an('object')
+    expect(innerS['@test/foo']).to.have.property('meta')
+    expect(innerS['@test/foo'].meta).to.have.property('name', '@test/foo')
+    expect(innerS['@test/foo']).to.have.property('path', 'packages/foo')
     mock.restore()
   })
   describe('Service', function () {
-    const service = createWorkspacesService()
     before(async () => {
       mock({
         ...common,
@@ -89,17 +89,17 @@ describe('Workspaces', function () {
           })
         }), {})
       })
-      await initWorkspaces(store)
+      await initWorkspaces()
       mock.restore()
     })
 
     it('should get all workspaces', async () => {
-      expect(service.length).to.equal(6)
-      expect(Array.from(service)).to.have.lengthOf(6)
+      expect(store.length).to.equal(6)
+      expect(Array.from(store)).to.have.lengthOf(6)
     })
     it('should get workspaces by glob', async () => {
-      expect(service['@test/*']).to.have.lengthOf(6)
-      expect(service['@test/plugin-*']).to.have.lengthOf(3)
+      expect(store['@test/*']).to.have.lengthOf(6)
+      expect(store['@test/plugin-*']).to.have.lengthOf(3)
     })
   })
 })

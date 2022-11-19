@@ -6,35 +6,20 @@ import * as path from 'path'
 
 export type Workspaces = Record<string, Workspace[]>
 
-export type WorkspacesService = Workspace[] & Record<string, Workspace[]> & IterableIterator<Workspace>
+export const INNER = Symbol('inner')
+
+export type WorkspacesService =
+  & Workspace[]
+  & Record<string, Workspace[]>
+  & IterableIterator<Workspace>
+  & {
+    [INNER]: Workspace[]
+  }
 
 declare module '@linearite/core' {
   export interface Context<N> {
     workspaces: WorkspacesService
   }
-}
-
-export const createWorkspacesService = (): WorkspacesService => {
-  return new Proxy({} as WorkspacesService, {
-    get(target, key) {
-      const keys = Object.keys(store)
-      switch (key) {
-        case Symbol.iterator:
-          return function* () {
-            for (const key of keys) {
-              yield store[key]
-            }
-          }
-        case 'length':
-          return keys.length
-      }
-      if (typeof key === 'string') {
-        return glob
-          .match(keys, key)
-          .map(key => store[key])
-      }
-    }
-  })
 }
 
 export async function treeDirPaths(dir: string, opts = {
@@ -60,13 +45,39 @@ export async function treeDirPaths(dir: string, opts = {
   return dirs
 }
 
-export const store: Record<string, Workspace> = {}
+const innerStore: Record<string, Workspace> = {}
+
+export const store = new Proxy({} as WorkspacesService, {
+  get(target, key) {
+    const keys = Object.keys(innerStore)
+    switch (key) {
+      case Symbol.iterator:
+        return function* () {
+          for (const key of keys) {
+            yield innerStore[key]
+          }
+        }
+      case INNER:
+        return innerStore
+      case 'length':
+        return keys.length
+    }
+    if (typeof key === 'string') {
+      if (Number.isInteger(+key)) {
+        return innerStore[keys[+key]]
+      }
+      return glob
+        .match(keys, key)
+        .map(key => innerStore[key])
+    }
+  }
+})
 
 function isPromiseFulfilledResult<T>(result: PromiseSettledResult<T>): result is PromiseFulfilledResult<T> {
   return result.status === 'fulfilled'
 }
 
-export async function initWorkspaces(store: Record<string, Workspace>) {
+export async function initWorkspaces() {
   const root = process.cwd()
   const workspaceMeta = JSON.parse(
     fs.readFileSync(path.resolve(
@@ -112,11 +123,9 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
     })
     .filter(isPromiseFulfilledResult)
     .map(r => r.value)
-  workspaces.forEach(w => store[w.meta.name] = w)
+  workspaces.forEach(w => innerStore[w.meta.name] = w)
 }
 
 Context.service('workspaces', class {
-  constructor(root?: Context) {
-    return createWorkspacesService()
-  }
+  constructor(root?: Context) { return store }
 })
