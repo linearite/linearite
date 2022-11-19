@@ -12,7 +12,7 @@ declare module '@linearite/core' {
     N extends Plugin.Names,
     C extends Context<N> = Context<N>
   > {
-    'build:item'(workspace: string, opts?: Parameters<Events<N, C>['build']>[0]): void
+    'build:item'(workspace: Linearite.Workspace, opts?: Parameters<Events<N, C>['build']>[0]): void
   }
 }
 
@@ -33,15 +33,27 @@ function getConfPath() {
 }
 
 function getConf(confPath?: string) {
+  let conf: Linearite.Configuration<Plugin.Names>
   if (confPath.endsWith('.ts')) {
     require('esbuild-register/dist/node').register()
   }
-  return require(
-    path.resolve(
-      process.cwd(),
-      confPath
-    )
+  conf = require(
+    path.resolve(confPath)
   ).default
+  if (conf.scope) {
+    conf.scope = Array.isArray(conf.scope) ? conf.scope : [conf.scope]
+  } else {
+    const pkg = require(path.resolve('package.json'))
+    /**
+     * match pkg name by rule:
+     * | `@workspaces/${scope}`
+     * | `workspaces-${scope}`
+     * | `${scope}-workspace`
+     * | `${scope}`
+     */
+    conf.scope = pkg.name.match(/@workspaces\/(.+)|workspaces-(.+)|(.+)-workspace|(.+)/)?.slice(1).filter(Boolean) ?? []
+  }
+  return conf
 }
 
 async function main() {
@@ -65,12 +77,24 @@ async function main() {
     workspaces: string
   }>()
 
-  const workspaces = workspacesOpt?.split(',').map(w => w.trim()) ?? []
+  const workspaceGlobStrArr = workspacesOpt?.split(',').map(w => w.trim()) ?? []
 
   await store[INIT]()
 
   const conf = getConf(confPath)
   const context = new Context(program, conf)
+
+  const workspaces = workspaceGlobStrArr
+    .map(w => {
+      const prefixes = Array.isArray(conf.scope)
+        ? conf.scope.map(s => `@${s}/*`)
+        : [`@${conf.scope}/*`]
+      prefixes.push('*')
+      return prefixes
+        .map(p => store[`${p}${w}`])
+        .flat()
+    })
+    .flat()
 
   Object
     .keys(conf)
