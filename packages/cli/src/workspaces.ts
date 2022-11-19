@@ -16,6 +16,7 @@ declare module '@linearite/core' {
 export type Workspaces = Record<string, Workspace[]>
 
 export const INNER = Symbol('inner')
+export const INIT = Symbol('init')
 
 export type WorkspacesService =
   & Workspace[]
@@ -23,6 +24,7 @@ export type WorkspacesService =
   & IterableIterator<Workspace>
   & {
     [INNER]: Workspace[]
+    [INIT](): Promise<void>
   }
 
 const innerStore: Record<string, Workspace> = {}
@@ -39,6 +41,8 @@ export const store = new Proxy({} as WorkspacesService, {
         }
       case INNER:
         return innerStore
+      case INIT:
+        return initWorkspaces()
       case 'length':
         return keys.length
     }
@@ -53,7 +57,7 @@ export const store = new Proxy({} as WorkspacesService, {
   }
 })
 
-export async function initWorkspaces() {
+async function initWorkspaces() {
   const root = process.cwd()
   const workspaceMeta = JSON.parse(
     fs.readFileSync(path.resolve(

@@ -3,7 +3,7 @@ import type FileSystem from 'mock-fs/lib/filesystem'
 import { expect } from 'chai'
 import Linearite from '@linearite/core'
 
-import { initWorkspaces, INNER, store } from '../src/workspaces'
+import { INIT, INNER, store } from '../src/workspaces'
 
 function createWorkspace(pkg: Linearite.Workspace['meta']) {
   return {
@@ -39,7 +39,7 @@ describe('Workspaces', function () {
       }), {})
     })
     expect(innerS).to.be.empty
-    await initWorkspaces()
+    await store[INIT]()
     expect(Object.keys(innerS))
       .to.have.lengthOf(6)
       .and.to.include.members([
@@ -62,7 +62,7 @@ describe('Workspaces', function () {
         })
       }), {})
     })
-    await initWorkspaces()
+    await store[INIT]()
     expect(innerS['@test/foo']).to.be.an('object')
     expect(innerS['@test/foo']).to.have.property('meta')
     expect(innerS['@test/foo'].meta).to.have.property('name', '@test/foo')
@@ -89,7 +89,7 @@ describe('Workspaces', function () {
           })
         }), {})
       })
-      await initWorkspaces()
+      await store[INIT]()
       mock.restore()
     })
 
