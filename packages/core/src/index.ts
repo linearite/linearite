@@ -18,6 +18,8 @@ export namespace Linearite {
   export interface Workspace {
     meta: {
       name?: string
+      main?: string
+      module?: string
       version?: string
       description?: string
       dependencies?: Record<string, string>
