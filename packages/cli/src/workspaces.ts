@@ -37,6 +37,10 @@ export async function treeDirPaths(dir: string, opts = {
 
 export const store: Record<string, Workspace> = {}
 
+function isPromiseFulfilledResult<T>(result: PromiseSettledResult<T>): result is PromiseFulfilledResult<T> {
+  return result.status === 'fulfilled'
+}
+
 export async function initWorkspaces(store: Record<string, Workspace>) {
   const root = process.cwd()
   const workspaceMeta = JSON.parse(
@@ -45,28 +49,38 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
       'package.json'
     )).toString()
   )
-  const workspaces = workspaceMeta.workspaces
-  if (workspaces === undefined) {
+  const workspacesProp = workspaceMeta.workspaces
+  if (workspacesProp === undefined) {
     throw new Error('not found workspaces')
   }
-  const workspacesGlob = Array.isArray(workspaces) ? workspaces : [workspaces]
+  const workspacesGlob = Array.isArray(workspacesProp) ? workspacesProp : [workspacesProp]
   const allDirs = await treeDirPaths(root)
   const dirs = allDirs.filter(d => workspacesGlob.some(g => glob(d, g)))
-  const workspacesMetas = await Promise.all(dirs.map(async d => JSON.parse(
-    (
-      await fs.promises.readFile(path.resolve(
-        root,
-        d,
-        'package.json'
-      ))
-    ).toString()
-  )))
-  workspacesMetas.forEach(meta => {
-    store[meta.name] = {
-      meta,
-      dir: path.resolve(root, meta.name),
+  const promiseResults = await Promise.allSettled<Workspace>(dirs.map(async d => {
+    const pkgPath = path.resolve(root, d, 'package.json')
+    if (
+      !await fs.promises.stat(pkgPath)
+        .then(() => true)
+        .catch(() => false)
+    ) {
+      throw new Error(`not found package.json in ${d}`)
     }
-  })
+    return JSON.parse(
+      (
+        await fs.promises.readFile(pkgPath)
+      ).toString()
+    )
+  }))
+  const workspaces = promiseResults
+    .map(r => {
+      if (r.status === 'rejected') {
+        console.warn(r)
+      }
+      return r
+    })
+    .filter(isPromiseFulfilledResult)
+    .map(r => r.value)
+  workspaces.forEach(w => store[w.meta.name] = w)
 }
 
 Context.service('workspaces', class {
