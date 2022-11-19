@@ -20,11 +20,12 @@ export default definePlugin({
   },
   call: (ctx, conf) => {
     ctx.on('build:item', async (workspace, opts) => {
-      console.log('> build:item', workspace.meta.name, opts, conf)
-      const format = Array.isArray(conf.format) ? conf.format : [conf.format]
       function dir(...paths: string[]) {
         return path.join(workspace.path, ...paths)
       }
+
+      console.log('> build:item', workspace.meta.name, opts, conf)
+      const format = Array.isArray(conf.format) ? conf.format : [conf.format]
       await Promise.all(format.map(async (format) => {
         if (format === 'umd')
           throw new Error('esbuild not support umd format')
