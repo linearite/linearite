@@ -94,6 +94,13 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
     })
 }
 
+function resolveBuilderOptsDefault(opts: Builder.Opts) {
+  if (opts.outdir === undefined) {
+    opts.outdir = 'dist'
+  }
+  return opts
+}
+
 export class Context<N extends Plugin.Names = Plugin.Names>
   extends cordis.Context<Context.Config<N>> {
 
@@ -129,7 +136,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
           : builder.conf
 
       // @ts-ignore
-      builder.call(this, builderOpts)
+      builder.call(this, resolveBuilderOptsDefault(builderOpts))
       registerBuildCommand(this)
       this[RegisterSymbol](builder)
     } else

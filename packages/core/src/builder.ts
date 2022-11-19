@@ -1,4 +1,6 @@
 import { Plugin } from './context'
+import Linearite from './index'
+import Workspace = Linearite.Workspace
 
 export namespace Builder {
   export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
@@ -21,6 +23,24 @@ export namespace Builder {
     type: Types
     target: string | string[]
     format: Format | Format[]
+    /**
+     * @default 'dist'
+     */
+    outdir?: string
+    /**
+     * output filename
+     *
+     * @default will falback as follows:
+     *
+     * * esm: `workspace.meta.module`
+     *
+     * * cjs: `workspace.meta.main`
+     *
+     * if workspace package.json not define module or main field, will fallback to:
+     *
+     * '[outdir]/index.[format]'
+     */
+    outfile?: string | ((outdir: string, format: Format, workspace: Workspace) => string)
     define?: Record<string, string>
     minify?: boolean
     external?: string[]
