@@ -2,6 +2,7 @@ import { Plugin } from './context'
 import Linearite from './index'
 
 export namespace Builder {
+  export type Platform = 'browser' | 'node' | 'neutral'
   export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
   /**
    * declare module '@linearite/core' {
@@ -22,6 +23,7 @@ export namespace Builder {
     type: Types
     target: string | string[]
     format: Format | Format[]
+    platform: Platform | Platform[]
     /**
      * @default 'dist'
      */

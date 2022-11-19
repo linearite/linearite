@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { build } from 'esbuild'
-import { definePlugin } from '@linearite/core'
+import { Builder, definePlugin } from '@linearite/core'
 
 declare module '@linearite/core' {
   namespace Builder {
@@ -17,6 +17,7 @@ export default definePlugin({
   conf: {
     target: ['node12'],
     format: ['esm', 'cjs'],
+    platform: ['neutral'],
   },
   call: (ctx, conf) => {
     ctx.on('build:item', async (workspace, opts) => {
@@ -26,7 +27,11 @@ export default definePlugin({
 
       console.log('> build:item', workspace.meta.name, opts, conf)
       const format = Array.isArray(conf.format) ? conf.format : [conf.format]
-      await Promise.all(format.map(async (format) => {
+      const platform = Array.isArray(conf.platform) ? conf.platform : [conf.platform]
+      const matrix = [format, platform].reduce((acc, cur) => {
+        return acc.flatMap((a) => cur.map((c) => [...a, c]))
+      }, [] as [Builder.Platform, Builder.Format][])
+      await Promise.all(matrix.map(async ([format, platform]) => {
         if (format === 'umd')
           throw new Error('esbuild not support umd format')
 
@@ -48,7 +53,7 @@ export default definePlugin({
           }[format],
           bundle: true,
           target: conf.target,
-          platform: 'node',
+          platform,
           format,
           external: Object.keys(workspace.meta.dependencies || {}),
         })
