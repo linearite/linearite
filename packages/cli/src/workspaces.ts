@@ -65,11 +65,14 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
     ) {
       throw new Error(`not found package.json in ${d}`)
     }
-    return JSON.parse(
-      (
-        await fs.promises.readFile(pkgPath)
-      ).toString()
-    )
+    return {
+      meta: JSON.parse(
+        (
+          await fs.promises.readFile(pkgPath)
+        ).toString()
+      ),
+      dir: d,
+    }
   }))
   const workspaces = promiseResults
     .map(r => {
