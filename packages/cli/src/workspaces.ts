@@ -42,7 +42,7 @@ export const store = new Proxy({} as WorkspacesService, {
       case INNER:
         return innerStore
       case INIT:
-        return initWorkspaces()
+        return initWorkspaces
       case 'length':
         return keys.length
     }
