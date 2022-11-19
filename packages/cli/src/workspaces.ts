@@ -6,10 +6,35 @@ import * as path from 'path'
 
 export type Workspaces = Record<string, Workspace[]>
 
+export type WorkspacesService = Workspace[] & Record<string, Workspace[]> & IterableIterator<Workspace>
+
 declare module '@linearite/core' {
   export interface Context<N> {
-    workspaces: Workspaces & IterableIterator<Workspace>
+    workspaces: WorkspacesService
   }
+}
+
+export const createWorkspacesService = (): WorkspacesService => {
+  return new Proxy({} as WorkspacesService, {
+    get(target, key) {
+      const keys = Object.keys(store)
+      switch (key) {
+        case Symbol.iterator:
+          return function* () {
+            for (const key of keys) {
+              yield store[key]
+            }
+          }
+        case 'length':
+          return keys.length
+      }
+      if (typeof key === 'string') {
+        return glob
+          .match(keys, key)
+          .map(key => store[key])
+      }
+    }
+  })
 }
 
 export async function treeDirPaths(dir: string, opts = {
@@ -91,26 +116,7 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
 }
 
 Context.service('workspaces', class {
-  constructor(root: Context) {
-    return new Proxy({} as Workspaces, {
-      get(target, key) {
-        const keys = Object.keys(store)
-        switch (key) {
-          case Symbol.iterator:
-            return function* () {
-              for (const key of keys) {
-                yield store[key]
-              }
-            }
-          case 'length':
-            return keys.length
-        }
-        if (typeof key === 'string') {
-          return glob
-            .match(keys, key)
-            .map(key => store[key])
-        }
-      }
-    })
+  constructor(root?: Context) {
+    return createWorkspacesService()
   }
 })
