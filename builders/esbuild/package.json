@@ -5,6 +5,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "esbuild": "^0.15.12",
-    "esbuild-register": "^3.3.3"
+    "esbuild-register": "^3.3.3",
+    "@linearite/core": "*"
   }
 }
