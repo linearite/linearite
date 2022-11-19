@@ -71,7 +71,7 @@ export async function initWorkspaces(store: Record<string, Workspace>) {
           await fs.promises.readFile(pkgPath)
         ).toString()
       ),
-      dir: d,
+      path: d,
     }
   }))
   const workspaces = promiseResults

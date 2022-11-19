@@ -23,7 +23,7 @@ export namespace Linearite {
       dependencies?: Record<string, string>
       devDependencies?: Record<string, string>
     }
-    dir: string
+    path: string
   }
   export const InnerConfKeys = ['matrix', 'builder', 'overides'] as const
   export type Configuration<N extends Plugin.Names> = {
