@@ -28,11 +28,26 @@ describe('Workspaces', function () {
       }), {
         // test empty folder
         'bar': {}
-      })
+      }),
+      plugins: ['foo', 'fuo', 'fuu'].reduce((acc, cur) => ({
+        ...acc,
+        [cur]: createWorkspace({
+          name: `@test/plugin-${cur}`,
+        })
+      }), {})
     })
     expect(store).to.be.empty
     await initWorkspaces(store)
     expect(Object.keys(store))
-      .to.have.lengthOf(3)
+      .to.have.lengthOf(6)
+      .and.to.include.members([
+        '@test/foo',
+        '@test/fuo',
+        '@test/fuu',
+        '@test/plugin-foo',
+        '@test/plugin-fuo',
+        '@test/plugin-fuu'
+      ])
+    mock.restore()
   })
 })
