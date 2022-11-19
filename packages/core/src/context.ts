@@ -58,9 +58,13 @@ export interface Events<
    */
   'build'(opts?: {
     /**
+     * skip select workspaces, if not set, will select workspaces
+     */
+    all: boolean
+    /**
      * tell build plugin need watch file change
      */
-    isWatch?: boolean
+    watch?: boolean
   }): void
 }
 
@@ -83,13 +87,10 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
   ctx
     [CommandSymbol]('build')
     .description('build workspaces')
+    .option('-a, --all', 'build all workspaces')
     .option('-w, --watch', 'watch file change')
-    .action(async (options: {
-      watch: boolean
-    }) => {
-      await ctx.parallel('build', {
-        isWatch: options.watch
-      })
+    .action(async (options: Parameters<Events<N>['build']>[0]) => {
+      await ctx.parallel('build', options)
     })
 }
 
