@@ -17,11 +17,11 @@ export namespace Linearite {
   }
   export interface Workspace {
     meta: {
-      name: string
-      version: string
-      description: string
-      dependencies: Record<string, string>
-      devDependencies: Record<string, string>
+      name?: string
+      version?: string
+      description?: string
+      dependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
     }
     dir: string
   }
