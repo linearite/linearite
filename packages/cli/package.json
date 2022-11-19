@@ -8,7 +8,9 @@
     "node": ">=10.0.0"
   },
   "devDependencies": {
-    "@types/minimatch": "^5.1.2"
+    "@types/minimatch": "^5.1.2",
+    "@types/mock-fs": "^4.13.1",
+    "mock-fs": "^4.13.0"
   },
   "dependencies": {
     "commander": "^9.4.1",
