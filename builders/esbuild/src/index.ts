@@ -23,7 +23,7 @@ function createMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
   }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
 }
 
-type MatrixResolver = (opts: BuildOptions) => void | Promise<void>
+type MatrixResolver = (opts: BuildOptions, matrix: ReturnType<typeof createMatrix>) => void | Promise<void>
 
 function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
   return (workspace: Linearite.Workspace, resolver: MatrixResolver) => {
@@ -31,8 +31,10 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
       return path.join(workspace.path, ...paths)
     }
 
-    return Promise.all(createMatrix(conf)
-      .map(async ([platform, format]) => {
+    const matrix = createMatrix(conf)
+
+    return Promise.all(
+      matrix.map(async ([platform, format]) => {
         if (format === 'umd')
           throw new Error('esbuild not support umd format')
 
@@ -59,7 +61,7 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
           format,
           platform,
           external: Object.keys(workspace.meta.dependencies || {}),
-        })
+        }, matrix)
       }))
   }
 }
@@ -75,7 +77,7 @@ export default definePlugin({
     const {
       corlorful,
     } = ctx
-    const workspaceResolver = useMatrix(conf)
+    const matrixResolver = useMatrix(conf)
 
     ctx.on('build:item', async (workspace, opts) => {
       console.log('> build:item', workspace.meta.name, opts, conf)
@@ -90,7 +92,7 @@ export default definePlugin({
             process.stdout.write(corlorful.green(`\rbuild succeeded (X${++continueCount})`))
         }
       } as BuildOptions['watch']
-      await workspaceResolver(workspace, async buildOpts => {
+      await matrixResolver(workspace, async buildOpts => {
         await build({
           ...buildOpts,
           watch: opts.watch ? watchOpts : undefined,
