@@ -60,7 +60,14 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
           target: conf.target,
           format,
           platform,
-          external: Object.keys(workspace.meta.dependencies || {}),
+          external: conf.external instanceof Function
+            ? conf.external(
+              Object.keys(workspace.meta.dependencies ?? {}),
+              Object.keys(workspace.meta.devDependencies ?? {}),
+              workspace,
+            )
+            : conf.external ?? Object.keys(workspace.meta.dependencies || {}),
+          sourcemap: conf.sourcemap,
         }, matrix)
       }))
   }
