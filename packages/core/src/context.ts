@@ -132,7 +132,7 @@ export class Context<N extends Plugin.Names = Plugin.Names>
       const builderOpts = isInherit
         ? builder.conf
         : typeof options.builder === 'object'
-          ? options.builder
+          ? Object.assign({}, builder.conf, options.builder)
           : builder.conf
 
       // @ts-ignore
