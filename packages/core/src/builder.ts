@@ -1,24 +1,21 @@
 import { Plugin } from './context'
 import Linearite from './index'
 
+/**
+ * declare module '@linearite/core' {
+ *   // ignore recusive type error, because it is work
+ *   // @ts-ignore
+ *   export interface BuilderConfs extends BuilderConfs {
+ *     name: SpecialConf
+ *   }
+ * }
+ */
 export interface BuilderConfs {}
 
 export namespace Builder {
   export type Platform = 'browser' | 'node' | 'neutral'
   export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
-  /**
-   * declare module '@linearite/core' {
-   *   export namespace Builder {
-   *     // ignore recusive type error, because it is work
-   *     // @ts-ignore
-   *     export interface Confs extends Confs {
-   *       name: SpecialConf
-   *     }
-   *   }
-   * }
-   */
-  export interface Confs extends BuilderConfs {}
-  export type Types = keyof Confs
+  export type Types = keyof BuilderConfs
   export type InferName<N extends Plugin.Names> = N extends `builder-${infer B extends Types}`
     ? B : never
   export interface Opts {
@@ -61,5 +58,5 @@ export namespace Builder {
   }
   export type Configuration<N extends Plugin.Names> =
     & Opts
-    & Confs[InferName<N>]
+    & BuilderConfs[InferName<N>]
 }
