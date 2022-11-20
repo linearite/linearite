@@ -43,7 +43,9 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
           console.warn(`not found main field in package.json, will fallback to \`${conf.outdir}/index.js\``)
         }
         await resolver({
-          entryPoints: [dir('src/index.ts')],
+          entryPoints: Array.isArray(conf.input)
+            ? conf.input.map((i) => dir(i))
+            : [dir(conf.input)],
           outfile: {
             esm: dir(workspace.meta.module
               ?? `${conf.outdir}/index.mjs`),
@@ -80,7 +82,6 @@ export default definePlugin({
       await workspaceResolver(workspace, async buildOpts => {
         await build(buildOpts)
       })
-      // log build success message
       console.log(corlorful.green(`build ${workspace.meta.name} success`))
     })
   }
