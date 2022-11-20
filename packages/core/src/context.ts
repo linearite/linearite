@@ -88,7 +88,7 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
     [CommandSymbol]('build')
     .description('build workspaces')
     .option('-a, --all', 'build all workspaces')
-    .option('-w, --watch', 'watch file change')
+    .option('--watch', 'watch file change')
     .action(async (options: Parameters<Events<N>['build']>[0]) => {
       await ctx.parallel('build', options)
     })
