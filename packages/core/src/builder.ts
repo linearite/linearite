@@ -59,6 +59,22 @@ export namespace Builder {
     external?: string[] | ((dep: string[], devDep: string[], workspace: Linearite.Workspace) => string[])
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
+  export type Dir = (...paths: string[]) => string
+  export function fieldResolve<K extends keyof Opts, T extends Opts[K]>(
+    key: K, def: T, opts: {
+      dir: Dir
+      workspace: Linearite.Workspace
+    }
+  ): T {
+    switch (key) {
+      case 'input':
+      case 'outfile':
+      case 'external':
+        // TODO support
+      default:
+        return def
+    }
+  }
   export type Configuration<N extends Plugin.Names> =
     & Opts
     & BuilderConfs[InferName<N>]
