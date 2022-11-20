@@ -6,13 +6,11 @@ import inquirer from 'inquirer'
 import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
 
+import './services'
 import { store, INIT } from './workspaces'
 
 declare module '@linearite/core' {
-  export interface Events<
-    N extends Plugin.Names,
-    C extends Context<N> = Context<N>
-  > {
+  export interface Events<N, C> {
     'build:item'(workspace: Linearite.Workspace, opts?: Parameters<Events<N, C>['build']>[0]): void
   }
 }

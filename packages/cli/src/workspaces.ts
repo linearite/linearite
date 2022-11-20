@@ -4,14 +4,7 @@ import * as path from 'path'
 import glob from 'minimatch'
 import Linearite, { Context } from '@linearite/core'
 import Workspace = Linearite.Workspace
-
 import { isPromiseFulfilledResult, treeDirPaths } from './utils'
-
-declare module '@linearite/core' {
-  export interface Context<N> {
-    workspaces: WorkspacesService
-  }
-}
 
 export type Workspaces = Record<string, Workspace[]>
 
