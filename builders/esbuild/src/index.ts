@@ -70,6 +70,9 @@ export default definePlugin({
     platform: ['neutral'],
   },
   call: (ctx, conf) => {
+    const {
+      corlorful,
+    } = ctx
     const workspaceResolver = useMatrix(conf)
 
     ctx.on('build:item', async (workspace, opts) => {
@@ -78,7 +81,7 @@ export default definePlugin({
         await build(buildOpts)
       })
       // log build success message
-      console.log(`> build ${workspace.meta.name} success`)
+      console.log(corlorful.green(`build ${workspace.meta.name} success`))
     })
   }
 })
