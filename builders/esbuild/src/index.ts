@@ -1,7 +1,7 @@
 import path from 'path'
 
-import { build } from 'esbuild'
-import { Builder, BuilderConfs, definePlugin } from '@linearite/core'
+import { build, BuildOptions } from 'esbuild'
+import { Builder, BuilderConfs, BuilderPluginConf, definePlugin, Linearite } from '@linearite/core'
 
 declare module '@linearite/core' {
   // @ts-ignore
@@ -10,26 +10,29 @@ declare module '@linearite/core' {
   }
 }
 
-export default definePlugin({
-  name: 'builder-esbuild',
-  conf: {
-    target: ['node12'],
-    format: ['esm', 'cjs'],
-    platform: ['neutral'],
-  },
-  call: (ctx, conf) => {
-    ctx.on('build:item', async (workspace, opts) => {
-      function dir(...paths: string[]) {
-        return path.join(workspace.path, ...paths)
-      }
+function resolveArray<T>(arr: T | T[]) {
+  return Array.isArray(arr) ? arr : [arr]
+}
 
-      console.log('> build:item', workspace.meta.name, opts, conf)
-      const format = Array.isArray(conf.format) ? conf.format : [conf.format]
-      const platform = Array.isArray(conf.platform) ? conf.platform : [conf.platform]
-      const matrix = [format, platform].reduce((acc, cur) => {
-        return acc.flatMap((a) => cur.map((c) => [...a, c]))
-      }, [] as [Builder.Platform, Builder.Format][])
-      await Promise.all(matrix.map(async ([format, platform]) => {
+function createMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
+  return [
+    resolveArray(conf.platform),
+    resolveArray(conf.format),
+  ].reduce((acc, cur) => {
+    return acc.flatMap((a) => cur.map((c) => [...a, c]))
+  }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
+}
+
+type MatrixResolver = (opts: BuildOptions) => void | Promise<void>
+
+function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
+  return (workspace: Linearite.Workspace, resolver: MatrixResolver) => {
+    function dir(...paths: string[]) {
+      return path.join(workspace.path, ...paths)
+    }
+
+    return Promise.all(createMatrix(conf)
+      .map(async ([platform, format]) => {
         if (format === 'umd')
           throw new Error('esbuild not support umd format')
 
@@ -39,7 +42,7 @@ export default definePlugin({
         if (format === 'cjs' && !workspace.meta.main) {
           console.warn(`not found main field in package.json, will fallback to \`${conf.outdir}/index.js\``)
         }
-        await build({
+        await resolver({
           entryPoints: [dir('src/index.ts')],
           outfile: {
             esm: dir(workspace.meta.module
@@ -51,11 +54,31 @@ export default definePlugin({
           }[format],
           bundle: true,
           target: conf.target,
-          platform,
           format,
+          platform,
           external: Object.keys(workspace.meta.dependencies || {}),
         })
       }))
+  }
+}
+
+export default definePlugin({
+  name: 'builder-esbuild',
+  conf: {
+    target: ['node12'],
+    format: ['esm', 'cjs'],
+    platform: ['neutral'],
+  },
+  call: (ctx, conf) => {
+    const workspaceResolver = useMatrix(conf)
+
+    ctx.on('build:item', async (workspace, opts) => {
+      console.log('> build:item', workspace.meta.name, opts, conf)
+      await workspaceResolver(workspace, async buildOpts => {
+        await build(buildOpts)
+      })
+      // log build success message
+      console.log(`> build ${workspace.meta.name} success`)
     })
   }
 })
