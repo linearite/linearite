@@ -53,7 +53,10 @@ export namespace Builder {
     outfile?: string | ((outdir: string, format: Format, workspace: Linearite.Workspace) => string)
     define?: Record<string, string>
     minify?: boolean
-    external?: string[]
+    /**
+     * @default workspace dependencies
+     */
+    external?: string[] | ((dep: string[], devDep: string[], workspace: Linearite.Workspace) => string[])
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
   export type Configuration<N extends Plugin.Names> =
