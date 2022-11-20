@@ -95,6 +95,9 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
 }
 
 function resolveBuilderOptsDefault(opts: Builder.Opts) {
+  if (opts.input === undefined) {
+    opts.input = 'src/index.ts'
+  }
   if (opts.outdir === undefined) {
     opts.outdir = 'dist'
   }

@@ -27,11 +27,18 @@ export namespace Builder {
     format: Format | Format[]
     platform: Platform | Platform[]
     /**
+     * entry points
+     * @default 'src/index.ts'
+     *
+     * TODO support glob
+     */
+    input?: string | string[]
+    /**
      * @default 'dist'
      */
     outdir?: string
     /**
-     * output filename
+     * output filename, only support one entry point
      *
      * @default will falback as follows:
      *
@@ -42,6 +49,9 @@ export namespace Builder {
      * if workspace package.json not define module or main field, will fallback to:
      *
      * '[outdir]/index.[format]'
+     *
+     * TODO support multi entry points
+     * TODO support package.json [exports field](https://nodejs.org/api/packages.html#packages_subpath_exports)
      */
     outfile?: string | ((outdir: string, format: Format, workspace: Linearite.Workspace) => string)
     define?: Record<string, string>
