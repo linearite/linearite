@@ -58,6 +58,7 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
           }[format],
           bundle: true,
           target: conf.target,
+          minify: conf.minify,
           format,
           platform,
           external: conf.external instanceof Function
