@@ -79,10 +79,28 @@ export default definePlugin({
 
     ctx.on('build:item', async (workspace, opts) => {
       console.log('> build:item', workspace.meta.name, opts, conf)
+      let continueCount = 0
+      const watchOpts = {
+        onRebuild(error) {
+          if (error) {
+            console.error(corlorful.red('build failed'), error)
+            continueCount = 0
+          } else
+            // log success message and rewrite line
+            process.stdout.write(corlorful.green(`\rbuild succeeded (X${++continueCount})`))
+        }
+      } as BuildOptions['watch']
       await workspaceResolver(workspace, async buildOpts => {
-        await build(buildOpts)
+        await build({
+          ...buildOpts,
+          watch: opts.watch ? watchOpts : undefined,
+        })
       })
-      console.log(corlorful.green(`build ${workspace.meta.name} success`))
+      console.log(
+        !opts.watch
+          ? corlorful.green(`build ${workspace.meta.name} success`)
+          : corlorful.green(`watching ${workspace.meta.name}`)
+      )
     })
   }
 })
