@@ -4,14 +4,17 @@ export default {
     type: 'esbuild',
     platform: 'node'
   },
-  // overides: [{
-  //   rules: '@linerite/cli',
-  //   builder: {
-  //     define: {
-  //       PKG_NAME: 'linearite',
-  //       PKG_VERSION: '0.0.0',
-  //       PKG_DESCRIPTION: 'linearite is a tool for building monorepo'
-  //     },
-  //   },
-  // }],
+  overides: {
+    '@linerite/cli': {
+      builder: {
+        outdir: 'bin',
+        format: 'cjs',
+        define: {
+          PKG_NAME: 'linearite',
+          PKG_VERSION: '${{PKG_VERSION}}',
+          PKG_DESCRIPTION: '${{PKG_DESCRIPTION}}'
+        },
+      },
+    }
+  }
 }
