@@ -64,23 +64,91 @@ export namespace Builder {
     external?: string[] | ((dep: string[], devDep: string[], workspace: Linearite.Workspace) => string[])
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
-  export type Dir = (...paths: string[]) => string
-  export function fieldResolve<K extends keyof Opts, T extends Opts[K]>(
-    key: K, def: T, opts: {
-      dir: Dir
-      workspace: Linearite.Workspace
-    }
-  ): T {
-    switch (key) {
-      case 'input':
-      case 'outfile':
-      case 'external':
-        // TODO support
-      default:
-        return def
-    }
-  }
   export type Configuration<N extends Plugin.Names> =
     & Opts
     & BuilderConfs[InferName<N>]
+}
+
+type Dir = (...paths: string[]) => string
+
+interface ResolverMap {
+  input: string[]
+  outfile: string
+  external: string[]
+}
+
+type L2T<L, LAlias = L> = [L] extends [never]
+  ? []
+  : L extends infer LItem
+    ? [LItem, ...L2T<Exclude<LAlias, LItem>>]
+    : never
+
+function isWhatBuilderOptsField<K extends keyof ResolverMap>(
+  field: Builder.Opts[keyof ResolverMap], k: keyof ResolverMap, tK: K
+): field is Builder.Opts[typeof tK] {
+  return (
+    [
+      'input',
+      'outfile',
+      'external',
+    ] as L2T<keyof ResolverMap>
+  ).includes(k) && k === tK
+}
+
+export function useBuilderFieldResolver<T extends Builder.Opts>(
+  conf: T, {
+    dir, workspace
+  }: {
+    dir: Dir
+    workspace: Linearite.Workspace
+  }
+) {
+  return <K extends keyof ResolverMap>(key: K): ResolverMap[K] => {
+    const def = conf[key]
+    if (isWhatBuilderOptsField(def, key, 'input')) {
+      return (
+        Array.isArray(def)
+          ? def.map(i => dir(i))
+          : [dir(def)]
+      ) as ResolverMap['input'] as ResolverMap[K]
+    }
+    if (isWhatBuilderOptsField(def, key, 'outfile')) {
+      let result: string
+      if (typeof def === 'function') {
+        result = def(
+          dir(conf.outdir),
+          conf.format as Builder.Format,
+          workspace
+        )
+      }
+      if (typeof def === 'string') {
+        result = {
+          esm: dir(workspace.meta.module
+            ?? `${conf.outdir}/index.mjs`),
+          cjs: dir(workspace.meta.main
+            ?? `${conf.outdir}/index.cjs`),
+          iife: dir(workspace.meta.main?.replace(/\.js$/, '.iife.js')
+            ?? `${conf.outdir}/index.iife.js`),
+        }[conf.format as Builder.Format]
+      }
+      if (result === undefined)
+        throw new Error(`outfile is undefined, please check your config`)
+
+      return result as ResolverMap['outfile'] as ResolverMap[K]
+    }
+    if (isWhatBuilderOptsField(def, key, 'external')) {
+      let result: string[]
+      if (typeof def === 'function') {
+        result = def(
+          Object.keys(workspace.meta.dependencies ?? {}),
+          Object.keys(workspace.meta.devDependencies ?? {}),
+          workspace,
+        )
+      }
+      if (Array.isArray(def)) {
+        result = def ?? Object.keys(workspace.meta.dependencies || {})
+      }
+      return result as ResolverMap['external'] as ResolverMap[K]
+    }
+  }
 }
