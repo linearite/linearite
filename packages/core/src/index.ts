@@ -56,6 +56,15 @@ export namespace Linearite {
           : never
           : never
       >
+    /**
+     * key support fuzzy prefix matching
+     * @example
+     * {
+     *   'scope@plugin-': {
+     *     // ...
+     *   }
+     * }
+     */
     overides?: Record<string, Configuration<Plugin.Names>>
   } & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
 }
