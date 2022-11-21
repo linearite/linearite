@@ -122,6 +122,9 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         )
       }
       if (typeof def === 'string') {
+        result = def
+      }
+      if (def === undefined) {
         result = {
           esm: dir(workspace.meta.module
             ?? `${conf.outdir}/index.mjs`),
@@ -131,8 +134,6 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
             ?? `${conf.outdir}/index.iife.js`),
         }[conf.format as Builder.Format]
       }
-      if (result === undefined)
-        throw new Error(`outfile is undefined, please check your config`)
 
       return result as ResolverMap['outfile'] as ResolverMap[K]
     }
@@ -146,7 +147,10 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         )
       }
       if (Array.isArray(def)) {
-        result = def ?? Object.keys(workspace.meta.dependencies || {})
+        result = def
+      }
+      if (def === undefined) {
+        result = Object.keys(workspace.meta.dependencies || {})
       }
       return result as ResolverMap['external'] as ResolverMap[K]
     }
