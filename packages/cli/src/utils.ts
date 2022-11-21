@@ -27,3 +27,21 @@ export async function treeDirPaths(dir: string, opts = {
   }))
   return dirs
 }
+
+/**
+ * merge all fields and recursively merge all object fields
+ */
+export function merge<T extends Record<string, any>>(...objs: T[]): T {
+  const result = {} as T
+  for (const obj of objs) {
+    for (const key in obj) {
+      const val = obj[key]
+      if (typeof val === 'object' && val !== null) {
+        (result as any)[key] = merge(result[key] || {}, val)
+      } else {
+        result[key] = val
+      }
+    }
+  }
+  return result
+}
