@@ -77,10 +77,10 @@ interface ResolverMap {
   external: string[]
 }
 
-type L2T<L, LAlias = L> = [L] extends [never]
+type L2T<L, LAlias = L, LAlias2 = L> = [L] extends [never]
   ? []
   : L extends infer LItem
-    ? [LItem, ...L2T<Exclude<LAlias, LItem>>]
+    ? [LAlias, ...L2T<Exclude<LAlias2, LItem>, LAlias>]
     : never
 
 function isWhatBuilderOptsField<K extends keyof ResolverMap>(
