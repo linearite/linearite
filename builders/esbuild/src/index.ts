@@ -1,7 +1,7 @@
 import path from 'path'
 
 import { build, BuildOptions } from 'esbuild'
-import { Builder, BuilderConfs, BuilderPluginConf, definePlugin, Linearite } from '@linearite/core'
+import { Builder, BuilderConfs, BuilderPluginConf, definePlugin, Linearite, useBuilderFieldResolver } from '@linearite/core'
 
 declare module '@linearite/core' {
   // @ts-ignore
@@ -44,30 +44,24 @@ function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
         if (format === 'cjs' && !workspace.meta.main) {
           console.warn(`not found main field in package.json, will fallback to \`${conf.outdir}/index.js\``)
         }
+
+        const filedResolver = useBuilderFieldResolver(
+          Object.assign({}, conf, {
+            format, platform,
+          }) as Builder.Opts,
+          { dir, workspace },
+        )
+
         await resolver({
-          entryPoints: Array.isArray(conf.input)
-            ? conf.input.map((i) => dir(i))
-            : [dir(conf.input)],
-          outfile: {
-            esm: dir(workspace.meta.module
-              ?? `${conf.outdir}/index.mjs`),
-            cjs: dir(workspace.meta.main
-              ?? `${conf.outdir}/index.cjs`),
-            iife: dir(workspace.meta.main?.replace(/\.js$/, '.iife.js')
-              ?? `${conf.outdir}/index.iife.js`),
-          }[format],
+          outfile: filedResolver('outfile'),
+          external: filedResolver('external'),
+          entryPoints: filedResolver('input'),
+
           bundle: true,
           target: conf.target,
           minify: conf.minify,
           format,
           platform,
-          external: conf.external instanceof Function
-            ? conf.external(
-              Object.keys(workspace.meta.dependencies ?? {}),
-              Object.keys(workspace.meta.devDependencies ?? {}),
-              workspace,
-            )
-            : conf.external ?? Object.keys(workspace.meta.dependencies || {}),
           sourcemap: conf.sourcemap,
         }, matrix)
       }))
