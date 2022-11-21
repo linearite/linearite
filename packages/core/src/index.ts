@@ -8,7 +8,7 @@ export * from './context'
 
 export namespace Linearite {
   export type MacroSytax =
-    | `PKG_${ 'NAME' | 'VERSION' }`
+    | `PKG_${ 'NAME' | 'VERSION' | 'DESCRIPTION' }`
     // (pkgName = '@scope/name') => name
     | 'L_NAME'
   export type Inherit = 'auto' | 'inherit' | true

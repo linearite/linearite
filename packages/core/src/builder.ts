@@ -51,6 +51,11 @@ export namespace Builder {
      * TODO support package.json [exports field](https://nodejs.org/api/packages.html#packages_subpath_exports)
      */
     outfile?: string | ((outdir: string, format: Format, workspace: Linearite.Workspace) => string)
+    /**
+     * @see https://esbuild.github.io/api/#define
+     *
+     * support {@link Linearite.MacroSytax} variables
+     */
     define?: Record<string, string>
     minify?: boolean
     /**
