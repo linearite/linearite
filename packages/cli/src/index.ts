@@ -8,6 +8,7 @@ import Linearite, { Context, Plugin } from '@linearite/core'
 
 import './services'
 import { store, INIT } from './workspaces'
+import './overides'
 
 declare module '@linearite/core' {
   export interface Events<N, C> {
