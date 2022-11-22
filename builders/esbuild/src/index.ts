@@ -81,14 +81,14 @@ export default definePlugin({
     format: ['esm', 'cjs'],
     platform: ['neutral'],
   },
-  call: (ctx, conf) => {
+  call: ctx => {
     const {
       corlorful,
     } = ctx
     ctx.on('build:item', async (workspace, opts) => {
-      const matrixResolver = useMatrix(
-        ctx.overides.calc(workspace.meta.name).builder
-      )
+      const conf = ctx.overides.calc(workspace.meta.name).builder
+
+      const matrixResolver = useMatrix(conf)
       console.log('> build:item', workspace.meta.name, opts, conf)
       let continueCount = 0
       const watchOpts = {
