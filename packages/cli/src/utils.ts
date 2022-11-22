@@ -36,11 +36,19 @@ export function merge<T extends Record<string, any>>(...objs: T[]): T {
   for (const obj of objs) {
     for (const key in obj) {
       const val = obj[key]
+      if (Array.isArray(val)) {
+        if (Array.isArray(result[key])) {
+          result[key].push(...val as any[])
+        } else {
+          result[key] = val
+        }
+        continue
+      }
       if (typeof val === 'object' && val !== null) {
         (result as any)[key] = merge(result[key] || {}, val)
-      } else {
-        result[key] = val
+        continue
       }
+      result[key] = val
     }
   }
   return result
