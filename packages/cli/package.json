@@ -15,9 +15,13 @@
     "mock-fs": "^4.13.0"
   },
   "dependencies": {
+    "@linearite/core": "*",
     "chalk": "^5.1.2",
     "commander": "^9.4.1",
     "inquirer": "^9.1.4",
     "minimatch": "^5.1.0"
+  },
+  "optionalDependencies": {
+    "esbuild-register": "^3.3.3"
   }
 }
