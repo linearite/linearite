@@ -18,6 +18,20 @@ export namespace Builder {
   export type Types = keyof BuilderConfs
   export type InferName<N extends Plugin.Names> = N extends `builder-${infer B extends Types}`
     ? B : never
+  export interface ExternalDef {
+    /**
+     * @param dep       - @see {Linearite.Workspace['meta']['dependencies']}
+     * @param optDep    - @see {Linearite.Workspace['meta']['optionalDependencies']}
+     * @param devDep    - @see {Linearite.Workspace['meta']['devDependencies']}
+     * @param workspace - @see {Linearite.Workspace}
+     */
+    (
+      dep: string[],
+      optDep: string[],
+      devDep: string[],
+      workspace: Linearite.Workspace
+    ): string[]
+  }
   export interface Opts {
     type: Types
     target: string | string[]
@@ -61,7 +75,7 @@ export namespace Builder {
     /**
      * @default workspace dependencies
      */
-    external?: string[] | ((dep: string[], devDep: string[], workspace: Linearite.Workspace) => string[])
+    external?: string[] | ExternalDef
     sourcemap?: boolean | 'linked' | 'inline' | 'external' | 'both'
   }
   export type Configuration<N extends Plugin.Names> =
@@ -142,6 +156,7 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
       if (typeof def === 'function') {
         result = def(
           Object.keys(workspace.meta.dependencies ?? {}),
+          Object.keys(workspace.meta.optionalDependencies ?? {}),
           Object.keys(workspace.meta.devDependencies ?? {}),
           workspace,
         )
@@ -150,7 +165,11 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         result = def
       }
       if (def === undefined) {
-        result = Object.keys(workspace.meta.dependencies || {})
+        result = Object.keys(
+          workspace.meta.dependencies || {}
+        ).concat(Object.keys(
+          workspace.meta.optionalDependencies || {}
+        ))
       }
       return result as ResolverMap['external'] as ResolverMap[K]
     }
