@@ -1,5 +1,7 @@
 import { Plugin } from './context'
-import Linearite from './index'
+import { L2T } from './type'
+import Linearite, { compileMacroSyntax } from './index'
+
 
 /**
  * declare module '@linearite/core' {
@@ -87,15 +89,10 @@ type Dir = (...paths: string[]) => string
 
 interface ResolverMap {
   input: string[]
+  define: Record<string, string>
   outfile: string
   external: string[]
 }
-
-type L2T<L, LAlias = L, LAlias2 = L> = [L] extends [never]
-  ? []
-  : L extends infer LItem
-    ? [LAlias, ...L2T<Exclude<LAlias2, LItem>, LAlias>]
-    : never
 
 function isWhatBuilderOptsField<K extends keyof ResolverMap>(
   field: Builder.Opts[keyof ResolverMap], k: keyof ResolverMap, tK: K
@@ -103,6 +100,7 @@ function isWhatBuilderOptsField<K extends keyof ResolverMap>(
   return (
     [
       'input',
+      'define',
       'outfile',
       'external',
     ] as L2T<keyof ResolverMap>
@@ -172,6 +170,12 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         ))
       }
       return result as ResolverMap['external'] as ResolverMap[K]
+    }
+    if (isWhatBuilderOptsField(def, key, 'define')) {
+      Object.entries(def).forEach(([k, v]) => {
+        def[k] = compileMacroSyntax(v, workspace)
+      })
+      return def as ResolverMap['define'] as ResolverMap[K]
     }
   }
 }
