@@ -10,7 +10,13 @@ export type BuilderPlugin<N extends Plugin.Names> = N extends `builder-${Builder
   ? {
     name: N
     conf: BuilderPluginConf<N>
-    call: (ctx: Context<N>, conf: BuilderPluginConf<N>) => void
+    /**
+     * @param ctx       - Linearite context
+     * @param rootConf  - root builder configuration, it's the same as `ctx.config.builder`
+     *                    but it's not calculated by `overides` service
+     *                    if you want to get the calculated configuration, use `ctx.overides.calc(workspace.meta.name).builder`
+     */
+    call: (ctx: Context<N>, rootConf: BuilderPluginConf<N>) => void
   }
   : never
 
