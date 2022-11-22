@@ -10,6 +10,22 @@ import './services'
 import { store, INIT } from './workspaces'
 import './overides'
 
+declare const PKG_VERSION: string
+declare const PKG_DESCRIPTION: string
+
+let isBuild = true
+
+try {
+  PKG_VERSION
+  PKG_DESCRIPTION
+} catch (e) {
+  if (e instanceof ReferenceError) {
+    isBuild = false
+  } else {
+    console.error(e)
+  }
+}
+
 declare module '@linearite/core' {
   export interface Events<N, C> {
     'build:item'(workspace: Linearite.Workspace, opts?: Parameters<Events<N, C>['build']>[0]): void
@@ -59,8 +75,17 @@ function getConf(confPath?: string) {
 async function main() {
   const program = new Command('line')
 
+  if (isBuild) {
+    program
+      .version(PKG_VERSION)
+      .description(PKG_DESCRIPTION)
+  } else {
+    program
+      .version('[internal build]')
+      .description('linearite CLI(internal build).')
+  }
+
   program
-    .version('0.0.1')
     .option('-c, --conf <path>', 'config file path', getConfPath())
     .option('-w, --workspaces <workspaces>', 'workspaces, support glob pattern and comma separated')
 
