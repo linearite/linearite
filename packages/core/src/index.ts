@@ -51,8 +51,17 @@ export namespace Linearite {
     }
     path: string
   }
-  export const InnerConfKeys = ['scope', 'builder', 'overides'] as const
-  export type Configuration<N extends Plugin.Names> = {
+  export interface FuzzyConfMap {
+    /**
+     * support fuzzy prefix matching
+     * @example
+     * | 'file://packages/*'
+     *
+     * | '@scope/*'
+     */
+    [K: string]: Configuration<Plugin.Names>
+  }
+  interface DefaultConf<N extends Plugin.Names = Plugin.Names> {
     /**
      * scope of workspace, support multi scope
      *
@@ -77,20 +86,16 @@ export namespace Linearite {
         N extends N
           ? N extends Plugin.Builders
             ? BuilderConfs[Builder.InferName<N>]
-          : never
+            : never
           : never
       >
-    /**
-     * key support fuzzy prefix matching
-     * @example
-     * {
-     *   'scope@plugin-': {
-     *     // ...
-     *   }
-     * }
-     */
-    overides?: Record<string, Configuration<Plugin.Names>>
-  } & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
+    matrix?: FuzzyConfMap
+    overides?: FuzzyConfMap
+  }
+  export const InnerConfKeys = ['scope', 'builder', 'matrix', 'overides'] as L2T<keyof DefaultConf>
+  export type Configuration<N extends Plugin.Names> =
+    & DefaultConf<N>
+    & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
