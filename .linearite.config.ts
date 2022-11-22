@@ -5,7 +5,7 @@ export default {
     platform: 'node'
   },
   overides: {
-    '@linerite/cli': {
+    '@linearite/cli': {
       builder: {
         outdir: 'bin',
         format: 'cjs',
