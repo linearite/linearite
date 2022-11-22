@@ -7,6 +7,6 @@
     "cordis": "^2.5.0"
   },
   "devDependencies": {
-    "commander": "^9.4.1"
+    "commander": "^8.3.0"
   }
 }
