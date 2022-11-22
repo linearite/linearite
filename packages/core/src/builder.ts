@@ -171,7 +171,7 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
       }
       return result as ResolverMap['external'] as ResolverMap[K]
     }
-    if (isWhatBuilderOptsField(def, key, 'define')) {
+    if (def && isWhatBuilderOptsField(def, key, 'define')) {
       Object.entries(def).forEach(([k, v]) => {
         def[k] = compileMacroSyntax(v, workspace)
       })
