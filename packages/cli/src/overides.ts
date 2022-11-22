@@ -1,12 +1,16 @@
-import Linearite, { Context, Plugin } from '@linearite/core'
+import Linearite, { Context, Plugin, resolveBuilderOpts } from '@linearite/core'
 import { merge } from './utils'
+
+type CalcBuilderConf =
+  & Linearite.Configuration<Plugin.Names>
+  & { builder: ReturnType<typeof resolveBuilderOpts>[1] }
 
 export class OveridesService {
   constructor(
     public ctx: Context<Plugin.Names>
   ) {
   }
-  calc(workspace: string, c = this.ctx.config): Linearite.Configuration<Plugin.Names> {
+  calc(workspace: string, c = this.ctx.config) {
     const { overides, ...config } = c
     const keys = Object.keys(overides || {})
     let overideConfig: Linearite.Configuration<Plugin.Names> = {}
@@ -18,7 +22,14 @@ export class OveridesService {
       }
       overideConfig = this.calc(workspace, overideConfig)
     }
-    return merge(config, overideConfig)
+    let result = merge(config, overideConfig)
+    // check is root callback
+    if (c === this.ctx.config) {
+      let [builder, builderOpts] = resolveBuilderOpts(result.builder)
+      result.builder = builderOpts
+      // TODO resolve builder
+    }
+    return result as CalcBuilderConf
   }
 }
 
