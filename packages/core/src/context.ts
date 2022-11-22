@@ -100,7 +100,7 @@ function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Contex
     })
 }
 
-function resolveBuilderOptsDefault(opts: Builder.Opts) {
+function resolveBuilderOptsField(opts: Builder.Opts) {
   if (opts.input === undefined) {
     opts.input = 'src/index.ts'
   }
@@ -108,6 +108,35 @@ function resolveBuilderOptsDefault(opts: Builder.Opts) {
     opts.outdir = 'dist'
   }
   return opts
+}
+
+export function resolveBuilderOpts(opts: Linearite.Configuration<Plugin.Builders>['builder']) {
+  let isInherit = Linearite.isInherit(opts)
+  let builderType: Builder.Types | undefined
+  if (isInherit) {
+    builderType = Context.defaultBuilder
+  } else {
+    if (typeof opts === 'string') {
+      builderType = opts as Builder.Types
+    }
+  }
+  if (typeof opts === 'object') {
+    builderType = opts.type
+  }
+  const builder = Plugin.r(`builder-${builderType}`)
+  if (Plugin.isBuilder(builder)) {
+    const builderOpts = isInherit
+      ? builder.conf
+      : typeof opts === 'object'
+        ? Object.assign({}, builder.conf, opts)
+        : builder.conf
+
+    return [
+      builder,
+      resolveBuilderOptsField(builderOpts as Builder.Opts)
+    ] as const
+  } else
+    throw new Error(`"builder-${builderType}" is not a builder plugin`)
 }
 
 export class Context<N extends Plugin.Names = Plugin.Names>
@@ -124,32 +153,10 @@ export class Context<N extends Plugin.Names = Plugin.Names>
     if (!options.builder)
       return
 
-    let isInherit = Linearite.isInherit(options.builder)
-    let builderType: Builder.Types | undefined
-    if (isInherit) {
-      builderType = Context.defaultBuilder
-    } else {
-      if (typeof options.builder === 'string') {
-        builderType = options.builder as Builder.Types
-      }
-    }
-    if (typeof options.builder === 'object') {
-      builderType = options.builder.type
-    }
-    const builder = Plugin.r(`builder-${builderType}`)
-    if (Plugin.isBuilder(builder)) {
-      const builderOpts = isInherit
-        ? builder.conf
-        : typeof options.builder === 'object'
-          ? Object.assign({}, builder.conf, options.builder)
-          : builder.conf
-
-      // @ts-ignore
-      builder.call(this, resolveBuilderOptsDefault(builderOpts))
-      registerBuildCommand(this)
-      this[RegisterSymbol](builder)
-    } else
-      throw new Error(`"builder-${builderType}" is not a builder plugin`)
+    const [builder, opts] = resolveBuilderOpts(options.builder)
+    builder.call(this as any, opts)
+    registerBuildCommand(this)
+    this[RegisterSymbol](builder)
   }
 
   public commands: Record<string, Command> = {}
