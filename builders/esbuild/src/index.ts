@@ -1,7 +1,13 @@
 import path from 'path'
 
 import { build, BuildOptions } from 'esbuild'
-import { Builder, BuilderConfs, BuilderPluginConf, definePlugin, Linearite, useBuilderFieldResolver } from '@linearite/core'
+import {
+  Builder,
+  BuilderConfs,
+  definePlugin,
+  Linearite,
+  useBuilderFieldResolver
+} from '@linearite/core'
 
 declare module '@linearite/core' {
   // @ts-ignore
@@ -14,7 +20,7 @@ function resolveArray<T>(arr: T | T[]) {
   return Array.isArray(arr) ? arr : [arr]
 }
 
-function createMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
+function createMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
   return [
     resolveArray(conf.platform),
     resolveArray(conf.format),
@@ -25,7 +31,7 @@ function createMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
 
 type MatrixResolver = (opts: BuildOptions, matrix: ReturnType<typeof createMatrix>) => void | Promise<void>
 
-function useMatrix(conf: BuilderPluginConf<'builder-esbuild'>) {
+function useMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
   return (workspace: Linearite.Workspace, resolver: MatrixResolver) => {
     function dir(...paths: string[]) {
       return path.join(workspace.path, ...paths)
@@ -79,9 +85,10 @@ export default definePlugin({
     const {
       corlorful,
     } = ctx
-    const matrixResolver = useMatrix(conf)
-
     ctx.on('build:item', async (workspace, opts) => {
+      const matrixResolver = useMatrix(
+        ctx.overides.calc(workspace.meta.name).builder
+      )
       console.log('> build:item', workspace.meta.name, opts, conf)
       let continueCount = 0
       const watchOpts = {
