@@ -1,10 +1,33 @@
 import { Builder, BuilderConfs } from './builder'
 import { Plugin } from './context'
-import { U2I } from './type'
+import { L2T, U2I } from './type'
 
 export * from './type'
 export * from './builder'
 export * from './context'
+
+export function compileMacroSyntax(str: string, workspace: Linearite.Workspace): string {
+  const macroSyntax: L2T<Linearite.MacroSytax> = [
+    'PKG_NAME',
+    'PKG_VERSION',
+    'PKG_DESCRIPTION',
+    'L_NAME'
+  ]
+  // support space in `${{ }}`, like `${{  PKG_NAME  }}`
+  const macroSyntaxReg = new RegExp(`\\$\\{{\\s*(${macroSyntax.join('|')})\\s*}}`, 'g')
+  return str.replace(macroSyntaxReg, (_, macro) => {
+    switch (macro) {
+      case 'PKG_NAME':
+        return workspace.meta.name
+      case 'PKG_VERSION':
+        return workspace.meta.version
+      case 'PKG_DESCRIPTION':
+        return workspace.meta.description
+      case 'L_NAME':
+        return workspace.meta.name.replace(/^@[^/]+\//, '')
+    }
+  })
+}
 
 export namespace Linearite {
   export type MacroSytax =

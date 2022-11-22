@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import Linearite, { defineConfiguration } from '@linearite/core'
+import Linearite, { compileMacroSyntax, defineConfiguration } from '@linearite/core'
 
 describe('core', function () {
   it('should test isInherit function', function () {
@@ -15,6 +15,24 @@ describe('core', function () {
       builder: true,
     })).to.be.deep.equal({
       builder: true,
+    })
+  })
+  describe('compileMacroSyntax', function () {
+    it('should test compileMacroSyntax function', function () {
+      const workspace = {
+        meta: {
+          name: '@linearite/core',
+          version: '1.0.0',
+          description: 'Linearite core',
+        },
+        path: '/path/to/workspace',
+      }
+      expect(compileMacroSyntax('${{PKG_NAME}}@${{PKG_VERSION}}', workspace))
+        .to.be.equal('@linearite/core@1.0.0')
+      expect(compileMacroSyntax('${{PKG_DESCRIPTION}}', workspace))
+        .to.be.equal('Linearite core')
+      expect(compileMacroSyntax('${{L_NAME}}@${{PKG_VERSION}}', workspace))
+        .to.be.equal('core@1.0.0')
     })
   })
 })
