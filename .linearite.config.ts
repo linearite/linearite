@@ -10,9 +10,9 @@ export default {
         outdir: 'bin',
         format: 'cjs',
         define: {
-          PKG_NAME: 'linearite',
-          PKG_VERSION: '${{PKG_VERSION}}',
-          PKG_DESCRIPTION: '${{PKG_DESCRIPTION}}'
+          PKG_NAME: '"linearite"',
+          PKG_VERSION: '"${{PKG_VERSION}}"',
+          PKG_DESCRIPTION: '"${{PKG_DESCRIPTION}}"'
         },
       },
     }
