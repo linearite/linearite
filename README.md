@@ -6,12 +6,13 @@
 
 * [ ] 支持多种 builder 的软件包构建
   * [ ] 支持多种类型 builder
-    * [ ] esbuild
+    * [x] esbuild
     * [ ] swc
+    * [ ] vite
   * [ ] 统一配置
 * [ ] 基于 monorepo 的软件包管理
   * [ ] 支持多种类型 monorepo
-    * [ ] yarn workspace
+    * [x] yarn workspace
     * [ ] pnpm workspace
     * [ ] lerna
   * [ ] 统一配置
