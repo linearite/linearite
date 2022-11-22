@@ -59,6 +59,7 @@ function useMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
         )
 
         await resolver({
+          define: filedResolver('define'),
           outfile: filedResolver('outfile'),
           external: filedResolver('external'),
           entryPoints: filedResolver('input'),
