@@ -38,11 +38,17 @@ export namespace Plugin {
     ? `builder-${B}`
     : never
   export type Names = keyof Confs | Builders
+  const cache = new Map<Names, Plugin<Names>>()
   export function r<N extends Names>(n: N) {
+    if (cache.has(n)) {
+      return cache.get(n) as Plugin<N>
+    }
     const l = ['@linearite/plugin-', 'linearite-plugin-', '']
     for (const p of l) {
       try {
-        return require(`${p}${n}`).default as Plugin<N>
+        const plugin = require(`${p}${n}`).default
+        cache.set(n, plugin)
+        return plugin as Plugin<N>
       } catch {}
     }
     throw new Error(`plugin ${n} not found`)
