@@ -35,4 +35,69 @@ describe('core', function () {
         .to.be.equal('core@1.0.0')
     })
   })
+  it('should test confFieldWalker function', function () {
+    expect(Linearite.confFieldWalker('builder', {
+    }, (field, k) => k)).to.be.deep.equal([], 'should return empty array')
+
+    expect(Linearite.confFieldWalker('builder', {
+      builder: true,
+      matrix: {
+        'foo': { builder: 'dts' },
+        'fuu': { builder: 'esbuild' },
+        'fuo': {}
+      },
+      overides: {
+        'bar': { builder: 'dts' },
+        'ber': { builder: 'esbuild' },
+        'bor': {},
+      }
+    }, () => 1))
+      .to.be.lengthOf(5, 'should return 5 items')
+      .that.to.be.deep.equal([...Array(5).fill(1)], 'all items should be 1')
+
+    expect(Linearite.confFieldWalker('builder', {
+      builder: 'dts',
+      matrix: {
+        'foo': { builder: 'dts' },
+        'fuu': { builder: 'esbuild' },
+        'fuo': {}
+      },
+      overides: {
+        'bar': { builder: 'dts' },
+        'ber': { builder: 'esbuild' },
+        'bor': {},
+      }
+    }, (field, k) => k))
+      .to.be.deep.equal([
+        [],
+        ['foo'],
+        ['fuu'],
+        ['bar'],
+        ['ber'],
+      ], 'should return all keys')
+
+    expect(Linearite.confFieldWalker('builder', {
+      builder: 'dts',
+      matrix: {
+        'foo': {
+          builder: 'dts',
+          matrix: {
+            'bar': { builder: 'dts' }
+          },
+          overides: {
+            'ber': { builder: 'esbuild' }
+          }
+        },
+        'fuu': { builder: 'esbuild' },
+        'fuo': {}
+      }
+    }, (field, k) => k))
+      .to.be.deep.equal([
+        [],
+        ['foo'],
+        ['foo', 'bar'],
+        ['foo', 'ber'],
+        ['fuu'],
+      ], 'should return all keys with nested matrix and overides')
+  })
 })

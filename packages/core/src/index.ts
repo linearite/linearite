@@ -97,6 +97,30 @@ export namespace Linearite {
   export type Configuration<N extends Plugin.Names> =
     & DefaultConf<N>
     & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
+  export function confFieldWalker<
+    N extends Exclude<Plugin.Names, Plugin.Builders> | 'builder',
+    T extends any,
+    NN extends N extends 'builder' ? Plugin.Builders : N
+  >(
+    name: N, conf: Configuration<Plugin.Names>,
+    walker: (field: Configuration<Plugin.Names>[N], k: string[]) => T,
+    prefix = []
+  ): T[] {
+    const fields: T[] = []
+    if (conf[name])
+      fields.push(walker(conf[name], prefix))
+
+    Object.entries(
+      conf.matrix || {}
+    ).concat(Object.entries(
+      conf.overides || {}
+    )).forEach(([key, conf]) => {
+      fields.push(...confFieldWalker(
+        name, conf, walker, prefix.concat(key)
+      ))
+    })
+    return fields
+  }
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf
