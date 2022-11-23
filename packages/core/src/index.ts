@@ -75,6 +75,7 @@ export namespace Linearite {
      *                              | `${scope}`
      */
     scope?: string | string[]
+    exclude?: string[]
     /**
      * builder config
      */
@@ -92,7 +93,7 @@ export namespace Linearite {
     matrix?: FuzzyConfMap
     overides?: FuzzyConfMap
   }
-  export const InnerConfKeys = ['scope', 'builder', 'matrix', 'overides'] as L2T<keyof DefaultConf>
+  export const InnerConfKeys = ['scope', 'exclude', 'builder', 'matrix', 'overides'] as L2T<keyof DefaultConf>
   export type Configuration<N extends Plugin.Names> =
     & DefaultConf<N>
     & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
