@@ -8,7 +8,7 @@ import { WorkspacesService } from './workspaces'
 declare module '@linearite/core' {
   export interface Context<N> {
     workspaces: WorkspacesService
-    corlorful: import('chalk').Chalk
+    corlorful: typeof import('chalk').default
     overides: OveridesService
   }
 }
