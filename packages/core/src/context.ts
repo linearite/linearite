@@ -11,12 +11,9 @@ export type BuilderPlugin<N extends Plugin.Names> = N extends `builder-${Builder
     name: N
     conf: BuilderPluginConf<N>
     /**
-     * @param ctx       - Linearite context
-     * @param rootConf  - root builder configuration, it's the same as `ctx.config.builder`
-     *                    but it's not calculated by `overides` service
-     *                    if you want to get the calculated configuration, use `ctx.overides.calc(workspace.meta.name).builder`
+     * @param ctx - Linearite context
      */
-    call: (ctx: Context<N>, rootConf: BuilderPluginConf<N>) => void
+    call: (ctx: Context<N>) => void
   }
   : never
 
@@ -90,11 +87,6 @@ export interface Context<N> {
  */
 const CommandSymbol = Symbol('command')
 
-/**
- * @internal
- */
-const RegisterSymbol = Symbol('register')
-
 function registerBuildCommand<N extends Plugin.Names = Plugin.Names>(ctx: Context<N>) {
   ctx
     [CommandSymbol]('build')
@@ -127,7 +119,7 @@ export function resolveBuilderOpts(opts: Linearite.Configuration<Plugin.Builders
     }
   }
   if (typeof opts === 'object') {
-    builderType = opts.type
+    builderType = opts.type ?? Context.defaultBuilder
   }
   const builder = Plugin.r(`builder-${builderType}`)
   if (Plugin.isBuilder(builder)) {
@@ -152,17 +144,16 @@ export class Context<N extends Plugin.Names = Plugin.Names>
 
   constructor(public program: Command, options?: Context.Config<N>) {
     super(options)
-    this.initBuild(program, options)
+    this.initRootBuilder(options)
   }
 
-  initBuild(program: Command, options?: Context.Config<Plugin.Builders>) {
+  private initRootBuilder(options?: Context.Config<Plugin.Builders>) {
     if (!options.builder)
       return
 
-    const [builder, opts] = resolveBuilderOpts(options.builder)
-    builder.call(this as any, opts)
+    const [builder] = resolveBuilderOpts(options.builder)
     registerBuildCommand(this)
-    this[RegisterSymbol](builder)
+    this.register(builder)
   }
 
   public commands: Record<string, Command> = {}
@@ -183,23 +174,9 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   public plugins: Record<string, Plugin<Plugin.Names>> = {}
 
   register<N extends Plugin.Names>(plugin: Plugin<N>) {
-    if (Plugin.isBuilder(plugin)) {
-      // forbid register builder plugin
-      throw new Error('builder plugin is reserved')
-    }
-    this[RegisterSymbol](plugin)
-  }
-
-  [RegisterSymbol]<N extends Plugin.Names>(plugin: Plugin<N>) {
     // @ts-ignore
     this.plugins[plugin.name] = plugin
-
-    if (Plugin.isBuilder(plugin)) {
-      return
-    }
-    if (Plugin.isNotBuilder(plugin)) {
-      plugin.call(this as any)
-    }
+    plugin.call(this as any)
   }
 }
 
