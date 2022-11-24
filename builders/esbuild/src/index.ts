@@ -87,7 +87,7 @@ export default definePlugin({
       corlorful,
     } = ctx
     ctx.on('build:item', async (workspace, opts) => {
-      const conf = ctx.overides.calc(workspace.meta.name).builder
+      const conf = ctx.overides.calc(workspace).builder
 
       const matrixResolver = useMatrix(conf)
       console.log('> build:item', workspace.meta.name, opts, conf)

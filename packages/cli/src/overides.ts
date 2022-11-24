@@ -10,13 +10,14 @@ export class OveridesService {
     public ctx: Context<Plugin.Names>
   ) {
   }
-  calc(workspace: string, c = this.ctx.config) {
+  calc(workspace: Linearite.Workspace, c = this.ctx.config) {
+    // TODO analysis whether resolve matrix field's overides field
     const { overides, ...config } = c
     const keys = Object.keys(overides || {})
     let overideConfig: Linearite.Configuration<Plugin.Names> = {}
     if (keys.length > 0) {
       for (const key of keys) {
-        if (workspace.startsWith(key)) {
+        if (workspace.meta.name.startsWith(key)) {
           overideConfig = merge(overideConfig, overides[key])
         }
       }
