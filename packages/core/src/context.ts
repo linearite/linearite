@@ -19,8 +19,6 @@ export type Plugin<N extends Plugin.Names> = N extends N
   )
   : never
 
-export type BuilderPlugin<N extends Plugin.Builders> = Plugin<N>
-
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
 
 export namespace Plugin {
