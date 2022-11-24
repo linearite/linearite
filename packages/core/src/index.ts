@@ -121,6 +121,34 @@ export namespace Linearite {
     })
     return fields
   }
+  /**
+   * 计算配置矩阵
+   * `conf.matrix` 字段触发新增配置线
+   * `conf.overides` 字段触发往当前配置线中新增规则
+   * 输出一个多条配置线的配置矩阵
+   */
+  export function calcConfMatrix(
+    c: Configuration<Plugin.Names>,
+    matrix: [keys: string[], conf: Configuration<Plugin.Names>][][] = [],
+    index = 0,
+    prefix: string[] = []
+  ) {
+    if (!matrix[index]) {
+      matrix.push([])
+    }
+    matrix[index].push([prefix, c])
+    if (c.matrix) {
+      Object.entries(c.matrix).forEach(([key, conf], i) => {
+        calcConfMatrix(conf, matrix, matrix.length, prefix.concat(key))
+      })
+    }
+    if (c.overides) {
+      Object.entries(c.overides).forEach(([key, conf]) => {
+        calcConfMatrix(conf, matrix, index, prefix.concat(key))
+      })
+    }
+    return matrix
+  }
 }
 
 export const defineConfiguration = <N extends Plugin.Names>(conf: Linearite.Configuration<N>) => conf

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import Linearite, { compileMacroSyntax, defineConfiguration } from '@linearite/core'
+import Linearite, { compileMacroSyntax, defineConfiguration, Plugin } from '@linearite/core'
 
 describe('core', function () {
   it('should test isInherit function', function () {
@@ -10,7 +10,7 @@ describe('core', function () {
     expect(Linearite.isInherit('')).to.be.false
     expect(Linearite.isInherit('false')).to.be.false
   })
-  it('should test defineConfiguration function', () => {
+  it('should test defineConfiguration function', function () {
     expect(defineConfiguration({
       builder: true,
     })).to.be.deep.equal({
@@ -97,5 +97,179 @@ describe('core', function () {
         ['foo', 'ber'],
         ['fuu'],
       ], 'should return all keys with nested matrix and overides')
+  })
+  it('should test calcConfMatrix function', () => {
+    const cases = {
+      'should resolve simplify conf': [
+        {
+          builder: 'dts',
+        },
+        conf => [
+          [
+            [[], conf]
+          ]
+        ],
+      ],
+      'should resolve conf with matrix': [
+        {
+          builder: 'dts',
+          matrix: {
+            a: {
+              builder: 'esbuild',
+            },
+            b: {
+              builder: 'dts',
+            }
+          }
+        },
+        conf => [
+          [
+            [[], conf]
+          ],
+          [
+            [['a'], conf.matrix.a]
+          ],
+          [
+            [['b'], conf.matrix.b]
+          ]
+        ]
+      ],
+      'should resolve conf with matrix and overides': [
+        {
+          builder: 'dts',
+          matrix: {
+            a: {
+              builder: 'esbuild',
+            },
+            b: {
+              builder: 'dts',
+            }
+          },
+          overides: {
+            c: {
+              builder: 'esbuild',
+            },
+            d: {
+              builder: 'dts',
+            }
+          }
+        },
+        conf => [
+          [
+            [[], conf],
+            [['c'], conf.overides.c],
+            [['d'], conf.overides.d]
+          ],
+          [
+            [['a'], conf.matrix.a]
+          ],
+          [
+            [['b'], conf.matrix.b]
+          ]
+        ]
+      ],
+      'should resolve nest conf': [
+        {
+          builder: 'dts',
+          matrix: {
+            'a': {
+              builder: 'dts'
+            },
+            'b': {
+              builder: 'esbuild',
+              overides: {
+                'c': {
+                  builder: 'dts'
+                },
+                'd': {
+                  builder: 'esbuild'
+                }
+              }
+            },
+            'e': {
+              builder: 'esbuild',
+              matrix: {
+                'f': {
+                  builder: 'dts'
+                },
+                'g': {
+                  builder: 'esbuild'
+                }
+              }
+            }
+          },
+          overides: {
+            'h': {
+              builder: 'dts',
+              matrix: {
+                'i': {
+                  builder: 'dts'
+                },
+                'j': {
+                  builder: 'esbuild'
+                }
+              },
+              overides: {
+                'k': {
+                  builder: 'dts'
+                }
+              }
+            }
+          },
+        },
+        conf => [
+          [
+            [[], conf],
+            [['h'], conf.overides.h],
+            [['h', 'k'], conf.overides.h.overides.k]
+          ],
+          [
+            [['a'], conf.matrix.a]
+          ],
+          [
+            [['b'], conf.matrix.b],
+            [['b', 'c'], conf.matrix.b.overides.c],
+            [['b', 'd'], conf.matrix.b.overides.d]
+          ],
+          [
+            [['e'], conf.matrix.e]
+          ],
+          [
+            [['e', 'f'], conf.matrix.e.matrix.f]
+          ],
+          [
+            [['e', 'g'], conf.matrix.e.matrix.g]
+          ],
+          [
+            [['h', 'i'], conf.overides.h.matrix.i]
+          ],
+          [
+            [['h', 'j'], conf.overides.h.matrix.j]
+          ]
+        ]
+      ],
+    } as Record<string, [
+      Linearite.Configuration<Plugin.Names>,
+      (conf: Linearite.Configuration<Plugin.Names>) => any[]
+    ]>
+    Object.entries(cases).forEach(([message, [conf, calcResult]]) => {
+      const [actual, expected] = [Linearite.calcConfMatrix(conf), calcResult(conf)]
+      actual.forEach((actualItem, i) => {
+        const expectedItem = expected[i]
+        // omit actualItem[number][1] overides and matrix fields
+        actualItem.forEach((actualItemItem) => {
+          delete actualItemItem[1].overides
+          delete actualItemItem[1].matrix
+        })
+        // omit expectedItem[number][1] overides and matrix fields
+        expectedItem.forEach((expectedItemItem) => {
+          delete expectedItemItem[1].overides
+          delete expectedItemItem[1].matrix
+        })
+        expect(actualItem, `${message} - [${i}]`).to.be.deep.equal(expectedItem)
+      })
+      expect(actual)
+        .to.be.lengthOf(expected.length, `${message} - should have same length`)
+    })
   })
 })
