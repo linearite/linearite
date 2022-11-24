@@ -6,25 +6,20 @@ import { Builder } from './builder'
 
 export type BuilderPluginConf<N extends Plugin.Names> = Omit<Builder.Configuration<N>, 'type'>
 
-export type BuilderPlugin<N extends Plugin.Names> = N extends `builder-${Builder.Types}`
+export type Plugin<N extends Plugin.Names> = N extends N
   ? {
     name: N
-    conf: BuilderPluginConf<N>
-    /**
-     * @param ctx - Linearite context
-     */
     call: (ctx: Context<N>) => void
-  }
+  } & (
+    | N extends `builder-${Builder.Types}`
+      ? {
+        conf: BuilderPluginConf<N>
+      }
+      : never
+  )
   : never
 
-export type Plugin<N extends Plugin.Names> = {
-  name: N
-} & (
-  | {
-    call: (ctx: Context<N>) => void
-  }
-  | BuilderPlugin<N>
-)
+export type BuilderPlugin<N extends Plugin.Builders> = Plugin<N>
 
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
 
@@ -50,11 +45,8 @@ export namespace Plugin {
     }
     throw new Error(`plugin ${n} not found`)
   }
-  export function isBuilder<N extends Names>(p: Plugin<N>): p is BuilderPlugin<N> {
+  export function isBuilder(p: Plugin<Names>): p is Plugin<Builders> {
     return p.name.startsWith('builder-')
-  }
-  export function isNotBuilder<N extends Names>(p: Plugin<N>): p is Exclude<Plugin<N>, BuilderPlugin<N>> {
-    return !isBuilder(p)
   }
 }
 
