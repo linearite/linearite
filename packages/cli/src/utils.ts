@@ -53,3 +53,9 @@ export function merge<T extends Record<string, any>>(...objs: T[]): T {
   }
   return result
 }
+
+export function omit<T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+  return Object.entries(obj)
+    .filter(([k]) => !keys.includes(k as K))
+    .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {} as Omit<T, K>)
+}
