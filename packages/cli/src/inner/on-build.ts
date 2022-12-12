@@ -8,7 +8,7 @@ export const onBuild = async (context: Context<Plugin.Names>, workspaces: Linear
   let curWorkspaces = workspaces
   if (curWorkspaces.length === 0) {
     const allWorkspaces = [...store]
-    if (opts.all) {
+    if (opts?.all) {
       curWorkspaces = allWorkspaces
     } else {
       let choices = [ 'all' ].concat(allWorkspaces.map(({ meta }) => meta.name))
@@ -36,7 +36,7 @@ export const onBuild = async (context: Context<Plugin.Names>, workspaces: Linear
       }
     }
   } else {
-    if (opts.all) {
+    if (opts?.all) {
       console.warn('ignore --all option')
     }
   }
