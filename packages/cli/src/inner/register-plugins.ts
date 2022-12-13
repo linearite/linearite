@@ -19,10 +19,8 @@ export function computeRelativeConfs(
         : keys.reduce((acc, key) => {
           return acc + workspaces.reduce((acc, workspace) => {
             const name = workspace.meta.name
-            return [
-              minimatch(key, name),
-              minimatch(`@${scope}/${key}`, name)
-            ].reduce((b, m) => b || m, false) ? 1 : 0
+            return [ key, `@${scope}/${key}` ]
+              .reduce((b, glob) => b || minimatch(glob, name), false) ? 1 : 0
           }, 0)
         }, 1)
       if (weight > preWeight) {
