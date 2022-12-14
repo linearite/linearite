@@ -35,12 +35,14 @@ describe('inner', function () {
   })
   describe('registerPlugins', function () {
     it('should compute relative confs', function () {
-      const conf = {
+      const matrix = Linearite.calcConfMatrix({
         builder: 'esbuild',
         tag: 'test',
         matrix: {
           foo: { builder: 'dts' },
-          bar: { builder: 'esbuild' }
+          bar: {
+            tag: 'test-bar'
+          }
         },
         overides: {
           fuu: { builder: 'dts' },
@@ -48,16 +50,28 @@ describe('inner', function () {
             tag: 'test-foo'
           }
         }
-      } as Linearite.Configuration<Plugin.Names>
+      })
       expect(
-        computeRelativeConfs('test', Linearite.calcConfMatrix(conf), [{
+        computeRelativeConfs('test', matrix, [{
           meta: { name: '@test/foo' },
           path: 'packages/foo'
         }])
       ).to.be.deep.equal([
         { tag: 'test-foo' },
-        { builder: 'dts' },
-        { builder: 'esbuild' }
+        { builder: 'dts' }
+      ])
+      expect(
+        computeRelativeConfs('test', matrix, [{
+          meta: { name: '@test/bar' },
+          path: 'packages/bar'
+        }, {
+          meta: { name: '@test/fuu' },
+          path: 'packages/fuu'
+        }])
+      ).to.be.deep.equal([
+        { builder: 'esbuild', tag: 'test' },
+        { tag: 'test-bar' },
+        { builder: 'dts' }
       ])
     })
   })

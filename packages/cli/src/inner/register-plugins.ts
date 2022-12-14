@@ -10,27 +10,31 @@ export function computeRelativeConfs(
   workspaces: Linearite.Workspace[]
 ) {
   const confs = [] as Linearite.Configuration<Plugin.Names>[]
-  matrix.forEach(link => {
-    let [preWeight, matchIndex] = [0, -1]
-    link.forEach(([keys, computeConf], index) => {
-      if (keys.length === 0) {}
-      const weight = keys.length === 0
-        ? 1
-        : keys.reduce((acc, key) => {
-          return acc + workspaces.reduce((acc, workspace) => {
-            const name = workspace.meta.name
-            return [ key, `@${scope}/${key}` ]
-              .reduce((b, glob) => b || minimatch(glob, name), false) ? 1 : 0
+  workspaces.forEach((workspace) => {
+    const name = workspace.meta.name
+    matrix.forEach(link => {
+      let [preWeight, matchIndex] = [0, -1]
+      link.forEach(([keys, computeConf], index) => {
+        if (keys.length === 0) {}
+        const weight = keys.length === 0
+          ? 1
+          : keys.reduce((acc, key) => {
+            return acc + ([
+              key,
+              `@${scope}/${key}`
+            ].reduce((b, glob) => b || minimatch(glob, name), false)
+              ? 2
+              : 0)
           }, 0)
-        }, 1)
-      if (weight > preWeight) {
-        preWeight = weight
-        matchIndex = index
+        if (weight > preWeight) {
+          preWeight = weight
+          matchIndex = index
+        }
+      })
+      if (matchIndex > -1) {
+        confs.push(omit(link[matchIndex][1], removeConfKeys))
       }
     })
-    if (matchIndex > -1) {
-      confs.push(omit(link[matchIndex][1], removeConfKeys))
-    }
   })
   return confs
 }
