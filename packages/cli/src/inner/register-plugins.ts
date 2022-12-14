@@ -5,10 +5,11 @@ import minimatch from 'minimatch'
 const removeConfKeys = Linearite.InnerConfKeys.filter(key => key !== 'builder')
 
 export function computeRelativeConfs(
-  scope: string,
+  scope: Linearite.Configuration<Plugin.Names>['scope'],
   matrix: ReturnType<typeof Linearite.calcConfMatrix>,
   workspaces: Linearite.Workspace[]
 ) {
+  const scopes = Array.isArray(scope) ? scope : [scope]
   const confs = [] as Linearite.Configuration<Plugin.Names>[]
   workspaces.forEach((workspace) => {
     const name = workspace.meta.name
@@ -20,8 +21,8 @@ export function computeRelativeConfs(
           ? 1
           : keys.reduce((acc, key) => {
             return acc + ([
+              ...scopes.map(scope => `@${scope}/${key}`),
               key,
-              `@${scope}/${key}`
             ].reduce((b, glob) => b || minimatch(glob, name), false)
               ? 2
               : 0)
