@@ -164,6 +164,8 @@ export class Context<N extends Plugin.Names = Plugin.Names>
   public plugins: Record<string, Plugin<Plugin.Names>> = {}
 
   register<N extends Plugin.Names>(plugin: Plugin<N>) {
+    if (this.plugins[plugin.name]) return
+
     // @ts-ignore
     this.plugins[plugin.name] = plugin
     plugin.call(this as any)
