@@ -3,7 +3,7 @@ import { Command } from 'commander'
 import { Context, Linearite, Plugin } from '@linearite/core'
 import { onBuild } from '../src/inner/on-build'
 import { expect } from 'chai'
-import { computeRelativeConfs } from '../src/inner/register-plugins'
+import { computeRelativeConfs } from '../src/inner/use-plugins'
 
 describe('inner', function () {
   describe('onBuild', function () {
@@ -33,7 +33,7 @@ describe('inner', function () {
       })
     })
   })
-  describe('registerPlugins', function () {
+  describe('usePlugins', function () {
     it('should compute relative confs', function () {
       const matrix = Linearite.calcConfMatrix({
         builder: 'esbuild',

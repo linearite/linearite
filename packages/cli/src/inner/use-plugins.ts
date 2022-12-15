@@ -40,5 +40,27 @@ export function computeRelativeConfs(
   return confs
 }
 
-export default function (conf: Linearite.Configuration<Plugin.Names>, workspaces: Linearite.Workspace[]) {
+export default function (
+  conf: Linearite.Configuration<Plugin.Names>,
+  matrix: ReturnType<typeof Linearite.calcConfMatrix>,
+  workspaces: Linearite.Workspace[]
+) {
+  const confs = computeRelativeConfs(conf.scope, matrix, workspaces)
+  const plugins = [] as Plugin<Plugin.Names>[]
+  confs
+    .reduce((acc, conf) => {
+      Object
+        .keys(conf)
+        .forEach(k => acc.add(k))
+      return acc
+    }, new Set<string>())
+    .forEach(k => {
+      try {
+        plugins.push(Plugin.r(k as Plugin.Names))
+      } catch (e) {
+        console.error(e)
+        console.warn(`you can use \`linearite plugin install ${k}\` to install plugin`)
+      }
+    })
+  return plugins
 }
