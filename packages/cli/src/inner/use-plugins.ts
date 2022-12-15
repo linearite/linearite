@@ -52,18 +52,19 @@ export default function (
       Object
         .keys(conf)
         .forEach(k => {
+          let name = k
           if (k === 'builder') {
             const prop = conf[k]
             if (typeof prop === 'string') {
-              acc.add(prop)
+              name = prop
             } else if (typeof prop === 'boolean') {
-              acc.add(Context.defaultBuilder)
+              name = Context.defaultBuilder
             } else if (typeof prop === 'object') {
-              prop.type && acc.add(prop.type)
+              prop.type && (name = prop.type)
             }
-          } else {
-            acc.add(k)
+            name = `builder-${name}`
           }
+          acc.add(name)
         })
       return acc
     }, new Set<string>())
