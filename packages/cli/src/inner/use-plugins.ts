@@ -1,4 +1,4 @@
-import Linearite, { Plugin } from '@linearite/core'
+import Linearite, { Context, Plugin } from '@linearite/core'
 import { omit } from '../utils'
 import minimatch from 'minimatch'
 
@@ -51,7 +51,20 @@ export default function (
     .reduce((acc, conf) => {
       Object
         .keys(conf)
-        .forEach(k => acc.add(k))
+        .forEach(k => {
+          if (k === 'builder') {
+            const prop = conf[k]
+            if (typeof prop === 'string') {
+              acc.add(prop)
+            } else if (typeof prop === 'boolean') {
+              acc.add(Context.defaultBuilder)
+            } else if (typeof prop === 'object') {
+              prop.type && acc.add(prop.type)
+            }
+          } else {
+            acc.add(k)
+          }
+        })
       return acc
     }, new Set<string>())
     .forEach(k => {
