@@ -9,6 +9,7 @@ import './services'
 import { store, INIT } from './workspaces'
 import './overides'
 import { onBuild } from './inner/on-build'
+import usePlugins from './inner/use-plugins'
 
 declare const PKG_VERSION: string
 declare const PKG_DESCRIPTION: string
@@ -121,24 +122,21 @@ async function main() {
     })
     .flat()
 
-  Object
-    .keys(conf)
-    .filter(k => !InnerConfKeys.includes(k as typeof InnerConfKeys[number]))
-    .forEach(k => {
-      try {
-        const plugin = Plugin.r(k as Plugin.Names)
-        context.register(plugin)
-      } catch (e) {
-        console.error(e)
-        console.warn(`you can use \`linearite plugin ${k}\` to install plugin`)
-      }
-    })
-
   context
     .on('build', onBuild.bind(null, context, workspaces))
 
   context
     .on('ready', () => {
+      const plugins = usePlugins(conf, context.overides.matrix, workspaces)
+      plugins.forEach(p => {
+        context.register(p)
+      })
+      console.log(`loaded plugins ${
+        plugins.map(p => p.name).join(', ')
+      } for workspaces:\n${
+        workspaces.map(w => `* ${w.meta.name}`).join('\n')
+      }`)
+      console.log('')
       program.parse()
     })
 
