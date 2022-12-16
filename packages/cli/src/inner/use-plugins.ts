@@ -23,7 +23,7 @@ export function computeRelativeConfs(
             return acc + ([
               ...scopes.map(scope => `@${scope}/${key}`),
               key,
-            ].reduce((b, glob) => b || minimatch(glob, name), false)
+            ].reduce((b, glob) => b || minimatch(name, glob), false)
               ? 2
               : 0)
           }, 0)
