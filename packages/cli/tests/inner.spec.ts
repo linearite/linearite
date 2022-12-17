@@ -39,6 +39,9 @@ describe('inner', function () {
         builder: 'esbuild',
         tag: 'test',
         matrix: {
+          '*': {
+            tag: 'test-*'
+          },
           foo: { builder: 'dts' },
           bar: {
             tag: 'test-bar'
@@ -58,6 +61,7 @@ describe('inner', function () {
         }])
       ).to.be.deep.equal([
         { tag: 'test-foo' },
+        { tag: 'test-*' },
         { builder: 'dts' }
       ])
       expect(
@@ -70,6 +74,7 @@ describe('inner', function () {
         }])
       ).to.be.deep.equal([
         { builder: 'esbuild', tag: 'test' },
+        { tag: 'test-*' },
         { tag: 'test-bar' },
         { builder: 'dts' }
       ])
