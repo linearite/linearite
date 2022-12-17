@@ -10,10 +10,10 @@ export function computeRelativeConfs(
   workspaces: Linearite.Workspace[]
 ) {
   const scopes = Array.isArray(scope) ? scope : [scope]
-  const confs = [] as Linearite.Configuration<Plugin.Names>[]
-  workspaces.forEach((workspace) => {
+  const confs = {} as Record<string, Linearite.Configuration<Plugin.Names>>
+  workspaces.forEach(workspace => {
     const name = workspace.meta.name
-    matrix.forEach(link => {
+    matrix.forEach((link, i) => {
       let [preWeight, matchIndex] = [0, -1]
       link.forEach(([keys, computeConf], index) => {
         if (keys.length === 0) {}
@@ -32,12 +32,12 @@ export function computeRelativeConfs(
           matchIndex = index
         }
       })
-      if (matchIndex > -1) {
-        confs.push(omit(link[matchIndex][1], removeConfKeys))
+      if (matchIndex > -1 && !confs[`${i}-${matchIndex}`]) {
+        confs[`${i}-${matchIndex}`] = omit(link[matchIndex][1], removeConfKeys)
       }
     })
   })
-  return confs
+  return Object.values(confs)
 }
 
 export default function (
