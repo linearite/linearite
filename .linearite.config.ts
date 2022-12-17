@@ -4,6 +4,12 @@ export default {
     type: 'esbuild',
     platform: 'node'
   },
+  matrix: {
+    '*': {
+      builder: 'dts',
+      exclude: ['@linearite/cli']
+    }
+  },
   overides: {
     '@linearite/cli': {
       builder: {
