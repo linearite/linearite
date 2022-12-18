@@ -6,9 +6,11 @@ type CalcBuilderConf =
   & { builder: ReturnType<typeof resolveBuilderOpts>[1] }
 
 export class OveridesService {
+  public matrix: ReturnType<typeof Linearite.calcConfMatrix>
   constructor(
     public ctx: Context<Plugin.Names>
   ) {
+    this.matrix = Linearite.calcConfMatrix(ctx.config)
   }
   calc(workspace: Linearite.Workspace, c = this.ctx.config) {
     // TODO analysis whether resolve matrix field's overides field
@@ -26,9 +28,8 @@ export class OveridesService {
     let result = merge(config, overideConfig)
     // check is root callback
     if (c === this.ctx.config) {
-      let [builder, builderOpts] = resolveBuilderOpts(result.builder)
+      let [, builderOpts] = resolveBuilderOpts(result.builder)
       result.builder = builderOpts
-      // TODO resolve builder
     }
     return result as CalcBuilderConf
   }
