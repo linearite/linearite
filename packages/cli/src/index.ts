@@ -128,15 +128,13 @@ async function main() {
   context
     .on('ready', () => {
       const plugins = usePlugins(conf, context.overides.matrix, workspaces)
-      plugins.forEach(p => {
-        context.register(p)
-      })
+      plugins.forEach(p => context.register(p))
+
       console.log(`loaded plugins ${
         plugins.map(p => p.name).join(', ')
       } for workspaces:\n${
         workspaces.map(w => `* ${w.meta.name}`).join('\n')
-      }`)
-      console.log('')
+      }\n`)
       program.parse()
     })
 
