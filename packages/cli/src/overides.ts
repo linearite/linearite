@@ -35,6 +35,7 @@ export class OveridesService {
   }
   _calc(workspace: Linearite.Workspace, c = this.ctx.config) {
     const overideConfs: Linearite.Configuration<Plugin.Names>[] = []
+    // TODO clac every matrix items link overides
   }
 }
 
