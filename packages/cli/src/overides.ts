@@ -33,6 +33,9 @@ export class OveridesService {
     }
     return result as CalcBuilderConf
   }
+  _calc(workspace: Linearite.Workspace, c = this.ctx.config) {
+    const overideConfs: Linearite.Configuration<Plugin.Names>[] = []
+  }
 }
 
 Context.service('overides', OveridesService)
