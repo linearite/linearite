@@ -16,10 +16,12 @@ export class OveridesService {
     const overideConfigs: Linearite.Configuration<Plugin.Names>[] = []
     this.matrix.forEach(link => {
       const conf = link.reduce((acc, [keys, computeConf]) => {
+        // TODO 非第一个元素的其他矩阵组需要合并根的配置
         if (keys.length === 0) {
           return acc
         }
         return keys.reduce((acc, key) => {
+          // TODO 处理其他的匹配模式，再将 use plugins 的逻辑和次数的统一维护
           return acc + (workspace.meta.name.startsWith(key) ? 2 : 0)
         }, 0) > 0
           ? merge(acc, omit(computeConf, Linearite.InnerConfKeys))
