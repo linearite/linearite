@@ -1,5 +1,5 @@
 import Linearite, { Context, Plugin, resolveBuilderOpts } from '@linearite/core'
-import { merge } from './utils'
+import { merge, omit } from './utils'
 
 type CalcBuilderConf =
   & Linearite.Configuration<Plugin.Names>
@@ -12,30 +12,24 @@ export class OveridesService {
   ) {
     this.matrix = Linearite.calcConfMatrix(ctx.config)
   }
-  calc(workspace: Linearite.Workspace, c = this.ctx.config) {
-    // TODO analysis whether resolve matrix field's overides field
-    const { overides, ...config } = c
-    const keys = Object.keys(overides || {})
-    let overideConfig: Linearite.Configuration<Plugin.Names> = {}
-    if (keys.length > 0) {
-      for (const key of keys) {
-        if (workspace.meta.name.startsWith(key)) {
-          overideConfig = merge(overideConfig, overides[key])
+  calc(workspace: Linearite.Workspace) {
+    const overideConfigs: Linearite.Configuration<Plugin.Names>[] = []
+    this.matrix.forEach(link => {
+      const conf = link.reduce((acc, [keys, computeConf]) => {
+        if (keys.length === 0) {
+          return acc
         }
+        return keys.reduce((acc, key) => {
+          return acc + (workspace.meta.name.startsWith(key) ? 2 : 0)
+        }, 0) > 0
+          ? merge(acc, omit(computeConf, Linearite.InnerConfKeys))
+          : acc
+      }, {})
+      if (Object.keys(conf).length > 0) {
+        overideConfigs.push(conf)
       }
-      overideConfig = this.calc(workspace, overideConfig)
-    }
-    let result = merge(config, overideConfig)
-    // check is root callback
-    if (c === this.ctx.config) {
-      let [, builderOpts] = resolveBuilderOpts(result.builder)
-      result.builder = builderOpts
-    }
-    return result as CalcBuilderConf
-  }
-  _calc(workspace: Linearite.Workspace, c = this.ctx.config) {
-    const overideConfs: Linearite.Configuration<Plugin.Names>[] = []
-    // TODO clac every matrix items link overides
+    })
+    return overideConfigs
   }
 }
 
