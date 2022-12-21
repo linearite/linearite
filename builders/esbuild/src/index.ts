@@ -5,7 +5,7 @@ import {
   Builder,
   BuilderConfs,
   definePlugin,
-  Linearite,
+  Linearite, resolveBuilderOpts,
   useBuilderFieldResolver
 } from '@linearite/core'
 
@@ -87,32 +87,34 @@ export default definePlugin({
       corlorful,
     } = ctx
     ctx.on('build:item', async (workspace, opts) => {
-      const conf = ctx.overides.calc(workspace).builder
-
-      const matrixResolver = useMatrix(conf)
-      console.log('> build:item', workspace.meta.name, opts, conf)
-      let continueCount = 0
-      const watchOpts = {
-        onRebuild(error) {
-          if (error) {
-            console.error(corlorful.red('build failed'), error)
-            continueCount = 0
-          } else
-            // log success message and rewrite line
-            process.stdout.write(corlorful.green(`\rbuild succeeded (X${++continueCount})`))
-        }
-      } as BuildOptions['watch']
-      await matrixResolver(workspace, async buildOpts => {
-        await build({
-          ...buildOpts,
-          watch: opts.watch ? watchOpts : undefined,
+      const confs = ctx.overides.calc(workspace)
+      await Promise.all(confs.map(async ({ builder }) => {
+        const [, conf] = resolveBuilderOpts(builder)
+        const matrixResolver = useMatrix(conf)
+        console.log('> build:item', workspace.meta.name, opts, conf)
+        let continueCount = 0
+        const watchOpts = {
+          onRebuild(error) {
+            if (error) {
+              console.error(corlorful.red('build failed'), error)
+              continueCount = 0
+            } else
+              // log success message and rewrite line
+              process.stdout.write(corlorful.green(`\rbuild succeeded (X${++continueCount})`))
+          }
+        } as BuildOptions['watch']
+        await matrixResolver(workspace, async buildOpts => {
+          await build({
+            ...buildOpts,
+            watch: opts.watch ? watchOpts : undefined,
+          })
         })
-      })
-      console.log(
-        !opts.watch
-          ? corlorful.green(`build ${workspace.meta.name} success`)
-          : corlorful.green(`watching ${workspace.meta.name}`)
-      )
+        console.log(
+          !opts.watch
+            ? corlorful.green(`build ${workspace.meta.name} success`)
+            : corlorful.green(`watching ${workspace.meta.name}`)
+        )
+      }))
     })
   }
 })
