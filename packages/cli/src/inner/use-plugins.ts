@@ -2,7 +2,7 @@ import Linearite, { Context, Plugin } from '@linearite/core'
 import { omit } from '../utils'
 import minimatch from 'minimatch'
 
-const removeConfKeys = Linearite.InnerConfKeys.filter(key => key !== 'builder')
+export const removeConfKeys = Linearite.InnerConfKeys.filter(key => key !== 'builder')
 
 export function computeRelativeConfs(
   scope: Linearite.Configuration<Plugin.Names>['scope'],
