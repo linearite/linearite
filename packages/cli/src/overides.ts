@@ -21,6 +21,7 @@ export class OveridesService {
           return acc
         }
         return keys.reduce((acc, key) => {
+          // TODO 处理其他的匹配模式，再将 use plugins 的逻辑和次数的统一维护
           return acc + (workspace.meta.name.startsWith(key) ? 2 : 0)
         }, 0) > 0
           ? merge(acc, omit(computeConf, Linearite.InnerConfKeys))
