@@ -1,5 +1,6 @@
 import Linearite, { Context, Plugin, resolveBuilderOpts } from '@linearite/core'
 import { merge, omit } from './utils'
+import minimatch from 'minimatch'
 
 type CalcBuilderConf =
   & Linearite.Configuration<Plugin.Names>
@@ -13,6 +14,13 @@ export class OveridesService {
     this.matrix = Linearite.calcConfMatrix(ctx.config)
   }
   calc(workspace: Linearite.Workspace) {
+    let { scope } = this.ctx.config
+    let scopes: string[]
+    if (!Array.isArray(scope))
+      scopes = [scope]
+    else
+      scopes = scope
+
     const overideConfigs: Linearite.Configuration<Plugin.Names>[] = []
     this.matrix.forEach(link => {
       const conf = link.reduce((acc, [keys, computeConf]) => {
@@ -22,7 +30,12 @@ export class OveridesService {
         }
         return keys.reduce((acc, key) => {
           // TODO 处理其他的匹配模式，再将 use plugins 的逻辑和次数的统一维护
-          return acc + (workspace.meta.name.startsWith(key) ? 2 : 0)
+          return acc + ([
+            ...scopes.map(scope => `@${scope}/${key}`),
+            key,
+          ].reduce((b, glob) => b || minimatch(workspace.meta.name, glob), false)
+            ? 2
+            : 0)
         }, 0) > 0
           ? merge(acc, omit(computeConf, Linearite.InnerConfKeys))
           : acc
