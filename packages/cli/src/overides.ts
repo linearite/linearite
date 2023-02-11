@@ -25,9 +25,9 @@ export class OveridesService {
     const overideConfigs: Linearite.Configuration<Plugin.Names>[] = []
     this.matrix.forEach((link, i) => {
       const conf = link.reduce((acc, [keys, computeConf]) => {
-        // TODO 非第一个元素的其他矩阵组需要合并根的配置
         if (keys.length === 0) {
-          return acc
+          // keys 为 0 时意味着这是一个根配置，直接返回
+          return omit(computeConf, removeConfKeys)
         }
         const weight = keys.reduce((acc, key) => {
           // TODO 处理其他的匹配模式，再将 use plugins 的逻辑和次数的统一维护
