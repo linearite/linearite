@@ -5,10 +5,10 @@ export class LoggerService {
   constructor(
     public ctx: Context<Plugin.Names>
   ) {}
-  log(type: 'error' | 'warn' | 'info', ...args: any[]) {
+  log(tag: string, type: 'error' | 'warn' | 'info', ...args: any[]) {
     console[type](
       chalk.blueBright(
-        `[${this.ctx.pluginName ?? 'linearite'}]`
+        `[${tag ?? 'linearite'}]`
       ),
       {
         error: chalk.bgRed,
@@ -18,14 +18,14 @@ export class LoggerService {
       ...args
     )
   }
-  info(...args: any[]) {
-    this.log('info', ...args)
+  info(tag: string, ...args: any[]) {
+    this.log(tag, 'info', ...args)
   }
-  warn(...args: any[]) {
-    this.log('warn', ...args)
+  warn(tag: string, ...args: any[]) {
+    this.log(tag, 'warn', ...args)
   }
-  error(...args: any[]) {
-    this.log('error', ...args)
+  error(tag: string, ...args: any[]) {
+    this.log(tag, 'error', ...args)
   }
 }
 
