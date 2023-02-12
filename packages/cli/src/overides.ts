@@ -1,4 +1,4 @@
-import Linearite, { Context, Plugin, resolveBuilderOpts } from '@linearite/core'
+import Linearite, { Context, Plugin } from '@linearite/core'
 import { merge, omit } from './utils'
 import minimatch from 'minimatch'
 import { removeConfKeys } from './inner/use-plugins'
