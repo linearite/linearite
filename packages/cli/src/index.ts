@@ -6,8 +6,9 @@ import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
 
 import './services'
-import { store, INIT } from './workspaces'
 import './overides'
+import './logger'
+import { store, INIT } from './workspaces'
 import { onBuild } from './inner/on-build'
 import usePlugins from './inner/use-plugins'
 
