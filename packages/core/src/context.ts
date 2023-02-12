@@ -132,6 +132,8 @@ export class Context<N extends Plugin.Names = Plugin.Names>
 
   static defaultBuilder: Builder.Types = 'esbuild'
 
+  public pluginName: string | undefined
+
   constructor(public program: Command, options?: Context.Config<N>) {
     super(options)
     this.initRootBuilder(options)
@@ -168,7 +170,9 @@ export class Context<N extends Plugin.Names = Plugin.Names>
 
     // @ts-ignore
     this.plugins[plugin.name] = plugin
-    plugin.call(this as any)
+    const extendContext = this.extend()
+    extendContext.pluginName = plugin.name
+    plugin.call(extendContext as any)
   }
 }
 
