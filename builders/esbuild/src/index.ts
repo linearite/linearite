@@ -91,12 +91,12 @@ export default definePlugin({
       await Promise.all(confs.map(async ({ builder }) => {
         const [, conf] = resolveBuilderOpts(builder)
         const matrixResolver = useMatrix(conf)
-        console.log('> build:item', workspace.meta.name, opts, conf)
+        ctx.logger.info(ctx.pluginName, 'build:item', workspace.meta.name, opts, conf)
         let continueCount = 0
         const watchOpts = {
           onRebuild(error) {
             if (error) {
-              console.error(corlorful.red('build failed'), error)
+              ctx.logger.error(ctx.pluginName, 'build failed', error)
               continueCount = 0
             } else
               // log success message and rewrite line
@@ -109,10 +109,11 @@ export default definePlugin({
             watch: opts.watch ? watchOpts : undefined,
           })
         })
-        console.log(
+        ctx.logger.info(
+          ctx.pluginName,
           !opts.watch
-            ? corlorful.green(`build ${workspace.meta.name} success`)
-            : corlorful.green(`watching ${workspace.meta.name}`)
+            ? `build:item ${workspace.meta.name} success`
+            : `build:item is watching ${workspace.meta.name}`
         )
       }))
     })
