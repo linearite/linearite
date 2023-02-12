@@ -3,10 +3,6 @@ import { merge, omit } from './utils'
 import minimatch from 'minimatch'
 import { removeConfKeys } from './inner/use-plugins'
 
-type CalcBuilderConf =
-  & Linearite.Configuration<Plugin.Names>
-  & { builder: ReturnType<typeof resolveBuilderOpts>[1] }
-
 export class OveridesService {
   public matrix: ReturnType<typeof Linearite.calcConfMatrix>
   constructor(
