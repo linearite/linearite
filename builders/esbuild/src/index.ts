@@ -1,12 +1,8 @@
-import path from 'path'
-
 import { build, BuildOptions } from 'esbuild'
 import {
-  Builder,
-  BuilderConfs,
+  BuilderConfs, createUseBuilderMatrix,
   definePlugin,
-  Linearite, resolveBuilderOpts,
-  useBuilderFieldResolver
+  resolveBuilderOpts,
 } from '@linearite/core'
 
 declare module '@linearite/core' {
@@ -16,64 +12,34 @@ declare module '@linearite/core' {
   }
 }
 
-function resolveArray<T>(arr: T | T[]) {
-  return Array.isArray(arr) ? arr : [arr]
-}
+const useMatrix = createUseBuilderMatrix(({
+  conf,
+  format,
+  platform,
+  workspace,
+  filedResolver
+}) => {
+  if (format === 'umd')
+    throw new Error('esbuild not support umd format')
+  if (format === 'esm' && !workspace.meta.module)
+    console.warn(`not found module field in package.json, will fallback to \`${conf.outdir}/index.mjs\``)
+  if (format === 'cjs' && !workspace.meta.main)
+    console.warn(`not found main field in package.json, will fallback to \`${conf.outdir}/index.js\``)
 
-function createMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
-  return [
-    resolveArray(conf.platform),
-    resolveArray(conf.format),
-  ].reduce((acc, cur) => {
-    return acc.flatMap((a) => cur.map((c) => [...a, c]))
-  }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
-}
+  return {
+    define: filedResolver('define'),
+    outfile: filedResolver('outfile'),
+    external: filedResolver('external'),
+    entryPoints: filedResolver('input'),
 
-type MatrixResolver = (opts: BuildOptions, matrix: ReturnType<typeof createMatrix>) => void | Promise<void>
-
-function useMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
-  return (workspace: Linearite.Workspace, resolver: MatrixResolver) => {
-    function dir(...paths: string[]) {
-      return path.join(workspace.path, ...paths)
-    }
-
-    const matrix = createMatrix(conf)
-
-    return Promise.all(
-      matrix.map(async ([platform, format]) => {
-        if (format === 'umd')
-          throw new Error('esbuild not support umd format')
-
-        if (format === 'esm' && !workspace.meta.module) {
-          console.warn(`not found module field in package.json, will fallback to \`${conf.outdir}/index.mjs\``)
-        }
-        if (format === 'cjs' && !workspace.meta.main) {
-          console.warn(`not found main field in package.json, will fallback to \`${conf.outdir}/index.js\``)
-        }
-
-        const filedResolver = useBuilderFieldResolver(
-          Object.assign({}, conf, {
-            format, platform,
-          }) as Builder.Opts,
-          { dir, workspace },
-        )
-
-        await resolver({
-          define: filedResolver('define'),
-          outfile: filedResolver('outfile'),
-          external: filedResolver('external'),
-          entryPoints: filedResolver('input'),
-
-          bundle: true,
-          target: conf.target,
-          minify: conf.minify,
-          format,
-          platform,
-          sourcemap: conf.sourcemap,
-        }, matrix)
-      }))
-  }
-}
+    bundle: true,
+    target: conf.target,
+    minify: conf.minify,
+    format,
+    platform,
+    sourcemap: conf.sourcemap,
+  };
+})
 
 export default definePlugin({
   name: 'builder-esbuild',

@@ -3,6 +3,7 @@ import { Plugin } from './context'
 import { L2T, U2I } from './type'
 
 export * from './type'
+export * from './utils'
 export * from './builder'
 export * from './context'
 

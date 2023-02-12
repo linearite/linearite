@@ -1,6 +1,10 @@
+import path from 'path'
+import { BuildOptions } from 'esbuild'
+
 import { Plugin } from './context'
 import { L2T } from './type'
 import Linearite, { compileMacroSyntax } from './index'
+import { resolveArray } from './utils'
 
 
 /**
@@ -176,6 +180,55 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         def[k] = compileMacroSyntax(v, workspace)
       })
       return def as ResolverMap['define'] as ResolverMap[K]
+    }
+  }
+}
+
+export function createBuilderMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
+  return [
+    resolveArray(conf.platform),
+    resolveArray(conf.format),
+  ].reduce((acc, cur) => {
+    return acc.flatMap((a) => cur.map((c) => [...a, c]))
+  }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
+}
+
+export type BuilderMatrixResolver = (opts: BuildOptions, matrix: ReturnType<typeof createBuilderMatrix>) => void | Promise<void>
+
+export type MatrixItemResolver<T extends Builder.Types> = (props: {
+  conf: Builder.Configuration<`builder-${T}`>
+  format: Builder.Format
+  platform: Builder.Platform
+  workspace: Linearite.Workspace
+  filedResolver: ReturnType<typeof useBuilderFieldResolver>
+}) => BuildOptions
+
+export function createUseBuilderMatrix<T extends Builder.Types>(
+  matrixItemResolver: MatrixItemResolver<T>
+) {
+  return function useMatrix(conf: Builder.Configuration<`builder-${T}`>) {
+    return (workspace: Linearite.Workspace, resolver: BuilderMatrixResolver) => {
+      function dir(...paths: string[]) {
+        return path.join(workspace.path, ...paths)
+      }
+      const matrix = createBuilderMatrix(conf)
+
+      return Promise.all(
+        matrix.map(async ([platform, format]) => {
+          await resolver(matrixItemResolver({
+            conf,
+            format,
+            platform,
+            workspace,
+            filedResolver: useBuilderFieldResolver(
+              Object.assign({}, conf, {
+                format, platform,
+              }) as Builder.Opts,
+              { dir, workspace },
+            )
+          }), matrix)
+        })
+      )
     }
   }
 }
