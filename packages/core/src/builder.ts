@@ -1,5 +1,4 @@
 import path from 'path'
-import { BuildOptions } from 'esbuild'
 
 import { Plugin } from './context'
 import { L2T } from './type'
@@ -20,7 +19,14 @@ export interface BuilderConfs {}
 
 export namespace Builder {
   export type Platform = 'browser' | 'node' | 'neutral'
-  export type Format = 'cjs' | 'esm' | 'iife' | 'umd'
+  export type Format =
+    // for js
+    | 'cjs' | 'esm' | 'iife' | 'umd'
+    // for dts
+    // all dts will be output to one file
+    | 'single-dts'
+    // all dts will be output to multiple files
+    | 'multiple-dts'
   export type Types = keyof BuilderConfs
   export type InferName<N extends Plugin.Names> = N extends `builder-${infer B extends Types}`
     ? B : never
@@ -193,7 +199,7 @@ export function createBuilderMatrix(conf: Builder.Configuration<'builder-esbuild
   }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
 }
 
-export type BuilderMatrixResolver = (opts: BuildOptions, matrix: ReturnType<typeof createBuilderMatrix>) => void | Promise<void>
+export type BuilderMatrixResolver = (opts: any, matrix: ReturnType<typeof createBuilderMatrix>) => void | Promise<void>
 
 export type MatrixItemResolver<T extends Builder.Types> = (props: {
   conf: Builder.Configuration<`builder-${T}`>
@@ -201,7 +207,7 @@ export type MatrixItemResolver<T extends Builder.Types> = (props: {
   platform: Builder.Platform
   workspace: Linearite.Workspace
   filedResolver: ReturnType<typeof useBuilderFieldResolver>
-}) => BuildOptions
+}) => any
 
 export function createUseBuilderMatrix<T extends Builder.Types>(
   matrixItemResolver: MatrixItemResolver<T>
