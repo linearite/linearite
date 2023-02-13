@@ -18,7 +18,7 @@ declare module '@linearite/core' {
   }
 }
 
-const useMatrix = createUseBuilderMatrix(({
+const useMatrix = createUseBuilderMatrix<'dts'>(({
   conf,
   format,
   platform,
