@@ -147,6 +147,11 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         result = def
       }
       if (def === undefined) {
+        // TODO resolve [exports](https://nodejs.org/docs/latest-v16.x/api/packages.html#exports)
+        let dtsDir: string | undefined
+        if (conf.format === 'multiple-dts') {
+          dtsDir = workspace.meta.types.replace(/(?=[^\/])\.d\.ts$/, '')
+        }
         result = {
           esm: dir(workspace.meta.module
             ?? `${conf.outdir}/index.mjs`),
@@ -154,6 +159,11 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
             ?? `${conf.outdir}/index.cjs`),
           iife: dir(workspace.meta.main?.replace(/\.js$/, '.iife.js')
             ?? `${conf.outdir}/index.iife.js`),
+          'multiple-dts': dtsDir
+            ? dir(dtsDir)
+            : `${conf.outdir}`,
+          'single-dts': dir(workspace.meta.types)
+            ?? `${conf.outdir}/index.d.ts`,
         }[conf.format as Builder.Format]
       }
 

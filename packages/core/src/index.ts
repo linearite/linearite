@@ -43,6 +43,7 @@ export namespace Linearite {
     meta: {
       name?: string
       main?: string
+      types?: string
       module?: string
       version?: string
       description?: string
