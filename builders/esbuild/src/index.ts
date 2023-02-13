@@ -12,7 +12,7 @@ declare module '@linearite/core' {
   }
 }
 
-const useMatrix = createUseBuilderMatrix(({
+const useMatrix = createUseBuilderMatrix<'esbuild'>(({
   conf,
   format,
   platform,
@@ -38,7 +38,7 @@ const useMatrix = createUseBuilderMatrix(({
     format,
     platform,
     sourcemap: conf.sourcemap,
-  };
+  } as BuildOptions;
 })
 
 export default definePlugin({
