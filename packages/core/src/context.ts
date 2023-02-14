@@ -15,7 +15,7 @@ export type Plugin<N extends Plugin.Names> = N extends N
       ? {
         conf: BuilderPluginConf<N>
       }
-      : never
+      : {}
   )
   : never
 
@@ -27,8 +27,8 @@ export namespace Plugin {
   export type Builders = Builder.Types extends (infer B extends string)
     ? `builder-${B}`
     : never
-  export type Names = keyof Confs | Builders
-  const cache = new Map<Names, Plugin<Names>>()
+  export type Names = keyof Confs | Builders | string & {}
+  const cache = new Map<Names, Plugin<any>>()
   export function r<N extends Names>(n: N) {
     if (cache.has(n)) {
       return cache.get(n) as Plugin<N>
@@ -36,9 +36,9 @@ export namespace Plugin {
     const l = ['@linearite/plugin-', 'linearite-plugin-', '']
     for (const p of l) {
       try {
-        const plugin = require(`${p}${n}`).default
+        const plugin = require(`${p}${n}`).default as Plugin<N>
         cache.set(n, plugin)
-        return plugin as Plugin<N>
+        return plugin
       } catch {}
     }
     throw new Error(`plugin ${n} not found`)
@@ -133,7 +133,7 @@ export function resolveBuilderOpts(opts: Linearite.Configuration<Plugin.Builders
 export class Context<N extends Plugin.Names = Plugin.Names>
   extends cordis.Context<Context.Config<N>> {
 
-  static defaultBuilder: Builder.Types = 'esbuild'
+  static defaultBuilder: Builder.Types = 'esbuild' as Builder.Types
 
   public pluginName: string | undefined
 
