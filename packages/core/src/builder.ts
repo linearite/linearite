@@ -150,7 +150,7 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
         // TODO resolve [exports](https://nodejs.org/docs/latest-v16.x/api/packages.html#exports)
         let dtsDir: string | undefined
         if (conf.format === 'multiple-dts') {
-          dtsDir = workspace.meta.types.replace(/(?=[^\/])\.d\.ts$/, '')
+          dtsDir = workspace.meta.types?.replace(/[^\/]+\.d\.ts$/, '')
         }
         result = {
           esm: () => dir(workspace.meta.module
