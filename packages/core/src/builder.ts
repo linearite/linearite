@@ -202,12 +202,11 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
 }
 
 export function createBuilderMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
-  return [
-    resolveArray(conf.platform),
-    resolveArray(conf.format),
-  ].reduce((acc, cur) => {
-    return acc.flatMap((a) => cur.map((c) => [...a, c]))
-  }, [[]] as ([Builder.Platform, Builder.Format] | [])[])
+  return (['platform', 'format'] as const)
+    .map(k => resolveArray(conf[k].length === 0 ? [undefined] : conf[k]))
+    .reduce((acc, cur) => {
+      return acc.flatMap((a) => cur.map((c) => [...a, c]))
+    }, [[]]) as [Builder.Platform, Builder.Format][]
 }
 
 export type BuilderMatrixResolver = (opts: any, matrix: ReturnType<typeof createBuilderMatrix>) => void | Promise<void>
