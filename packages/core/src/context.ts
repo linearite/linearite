@@ -121,7 +121,10 @@ export function resolveBuilderOpts(opts: Linearite.Configuration<Plugin.Builders
 
     return [
       builder,
-      resolveBuilderOptsField(builderOpts as Builder.Opts)
+      resolveBuilderOptsField({
+        type: builderType,
+        ...builderOpts,
+      } as Builder.Opts)
     ] as const
   } else
     throw new Error(`"builder-${builderType}" is not a builder plugin`)
