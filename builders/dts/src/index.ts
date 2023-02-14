@@ -40,7 +40,7 @@ const useMatrix = createUseBuilderMatrix<'dts'>(({
     console.warn('dts not support define')
 
   if (conf.sourcemap && typeof conf.sourcemap !== 'boolean')
-    console.warn('dts not support sourcemap')
+    console.warn('dts sourceMap option only support boolean')
 
   // TODO resolve [typeVersions](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)
 
