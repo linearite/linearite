@@ -27,7 +27,7 @@ export namespace Plugin {
   export type Builders = Builder.Types extends (infer B extends string)
     ? `builder-${B}`
     : never
-  export type Names = keyof Confs | Builders | string & {}
+  export type Names = keyof Confs | Builders
   const cache = new Map<Names, Plugin<any>>()
   export function r<N extends Names>(n: N) {
     if (cache.has(n)) {
