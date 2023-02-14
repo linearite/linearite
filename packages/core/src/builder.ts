@@ -213,6 +213,7 @@ export function createBuilderMatrix(conf: Builder.Configuration<'builder-esbuild
 export type BuilderMatrixResolver = (opts: any, matrix: ReturnType<typeof createBuilderMatrix>) => void | Promise<void>
 
 export type MatrixItemResolver<T extends Builder.Types> = (props: {
+  dir: (...paths: string[]) => string
   conf: Builder.Configuration<`builder-${T}`>
   format: Builder.Format
   platform: Builder.Platform
@@ -233,6 +234,7 @@ export function createUseBuilderMatrix<T extends Builder.Types>(
       return Promise.all(
         matrix.map(async ([platform, format]) => {
           await resolver(matrixItemResolver({
+            dir,
             conf,
             format,
             platform,
