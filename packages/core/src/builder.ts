@@ -1,5 +1,3 @@
-import path from 'path'
-
 import { Plugin } from './context'
 import { L2T } from './type'
 import Linearite, { compileMacroSyntax } from './index'
@@ -226,7 +224,7 @@ export function createUseBuilderMatrix<T extends Builder.Types>(
   return function useMatrix(conf: Builder.Configuration<`builder-${T}`>) {
     return (workspace: Linearite.Workspace, resolver: BuilderMatrixResolver) => {
       function dir(...paths: string[]) {
-        return path.join(workspace.path, ...paths)
+        return [workspace.path, ...paths].join('/')
       }
       const matrix = createBuilderMatrix(conf)
 
