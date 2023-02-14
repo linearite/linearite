@@ -153,19 +153,19 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
           dtsDir = workspace.meta.types.replace(/(?=[^\/])\.d\.ts$/, '')
         }
         result = {
-          esm: dir(workspace.meta.module
+          esm: () => dir(workspace.meta.module
             ?? `${conf.outdir}/index.mjs`),
-          cjs: dir(workspace.meta.main
+          cjs: () => dir(workspace.meta.main
             ?? `${conf.outdir}/index.cjs`),
-          iife: dir(workspace.meta.main?.replace(/\.js$/, '.iife.js')
+          iife: () => dir(workspace.meta.main?.replace(/\.js$/, '.iife.js')
             ?? `${conf.outdir}/index.iife.js`),
-          'multiple-dts': dtsDir
+          'multiple-dts': () => dtsDir
             ? dir(dtsDir)
             : `${conf.outdir}`,
-          'single-dts': workspace.meta.types
+          'single-dts': () => workspace.meta.types
             ? dir(workspace.meta.types)
             : `${conf.outdir}/index.d.ts`,
-        }[conf.format as Builder.Format]
+        }[conf.format as Builder.Format]()
       }
 
       return result as ResolverMap['outfile'] as ResolverMap[K]
