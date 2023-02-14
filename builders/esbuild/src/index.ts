@@ -56,6 +56,8 @@ export default definePlugin({
       const confs = ctx.overides.calc(workspace)
       await Promise.all(confs.map(async ({ builder }) => {
         const [, conf] = resolveBuilderOpts(builder)
+        if (conf.type !== 'esbuild') return
+
         const matrixResolver = useMatrix(conf)
         ctx.logger.info(ctx.pluginName, 'build:item', workspace.meta.name, opts, conf)
         let continueCount = 0
