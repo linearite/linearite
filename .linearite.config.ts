@@ -1,4 +1,3 @@
-/** @type {import('@linearite/core').Linearite.Configuration} */
 export default {
   builder: {
     type: 'esbuild',
@@ -13,8 +12,10 @@ export default {
   overides: {
     '@linearite/cli': {
       builder: {
+        type: 'esbuild',
         outdir: 'bin',
         format: 'cjs',
+        platform: 'node',
         define: {
           PKG_NAME: '"linearite"',
           PKG_VERSION: '"${{PKG_VERSION}}"',

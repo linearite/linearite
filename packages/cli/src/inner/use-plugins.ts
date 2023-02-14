@@ -60,7 +60,10 @@ export default function (
             } else if (typeof prop === 'boolean') {
               name = Context.defaultBuilder
             } else if (typeof prop === 'object') {
-              prop.type && (name = prop.type)
+              if (prop.type)
+                name = prop.type
+              else
+                throw new Error('builder type is required')
             }
             name = `builder-${name}`
           }
