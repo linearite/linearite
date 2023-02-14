@@ -162,8 +162,9 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
           'multiple-dts': dtsDir
             ? dir(dtsDir)
             : `${conf.outdir}`,
-          'single-dts': dir(workspace.meta.types)
-            ?? `${conf.outdir}/index.d.ts`,
+          'single-dts': workspace.meta.types
+            ? dir(workspace.meta.types)
+            : `${conf.outdir}/index.d.ts`,
         }[conf.format as Builder.Format]
       }
 
