@@ -199,7 +199,10 @@ export function useBuilderFieldResolver<T extends Builder.Opts>(
   }
 }
 
-export function createBuilderMatrix(conf: Builder.Configuration<'builder-esbuild'>) {
+export function createBuilderMatrix(conf: {
+  format: Builder.Format | Builder.Format[]
+  platform: Builder.Platform | Builder.Platform[]
+}) {
   return (['platform', 'format'] as const)
     .map(k => resolveArray(conf[k].length === 0 ? [undefined] : conf[k]))
     .reduce((acc, cur) => {
