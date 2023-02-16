@@ -1,9 +1,10 @@
-import path from 'path'
 import * as process from 'process'
 import * as child_process from 'child_process'
 import { CompilerOptions } from 'typescript'
+import * as ts from 'typescript'
 
 import { createUseBuilderMatrix, definePlugin, resolveBuilderOpts } from '@linearite/core'
+import fs from 'fs'
 
 export interface TSConfig {
   files?: string[]
@@ -17,6 +18,12 @@ declare module '@linearite/core' {
   // @ts-ignore
   interface BuilderConfs extends BuilderConfs {
     dts: {
+      /**
+       * @default 'tsconfig.json'
+       * 默认为当前工作区的根目录
+       * 如果配置的为路径，则会覆盖默认路径
+       * 如果为配置，则会合并默认路径文件的配置
+       */
       tsconfig?: string | TSConfig
     }
   }
@@ -26,7 +33,6 @@ const useMatrix = createUseBuilderMatrix<'dts'>(({
   conf,
   format,
   platform,
-  workspace,
   filedResolver,
 }) => {
   if (!['single-dts', 'multiple-dts'].includes(format))
@@ -46,20 +52,19 @@ const useMatrix = createUseBuilderMatrix<'dts'>(({
 
   // TODO resolve [typeVersions](https://www.typescriptlang.org/docs/handbook/declaration-files/publishing.html#version-selection-with-typesversions)
 
-  // replace `workspace.path` as '', because `tsc` command cwd is set as `workspace.path`
+  const tsconfigPath = typeof conf.tsconfig === 'string'
+    ? conf.tsconfig
+    : 'tsconfig.json'
+  const { config, error } = ts.readConfigFile(tsconfigPath, ts.sys.readFile)
+  if (error) throw error
   return {
-    ...(
-      typeof conf.tsconfig === 'string'
-        ? { extends: conf.tsconfig.replace(workspace.path, '.'), }
-        : {}
-    ),
-    include: filedResolver('input').map(p => p.replace(workspace.path, '.')),
-    compilerOptions: {
-      outDir: filedResolver('outfile').replace(workspace.path, '.'),
+    include: filedResolver('input'),
+    compilerOptions: Object.assign(config.compilerOptions, {
+      outDir: filedResolver('outfile'),
       declaration: true,
       declarationMap: conf.sourcemap,
       emitDeclarationOnly: true,
-    },
+    }),
   } as TSConfig
 })
 
@@ -83,18 +88,16 @@ export default definePlugin({
         const matrixResolver = useMatrix(conf)
         ctx.logger.info(ctx.pluginName, 'build:item', workspace.meta.name, opts, conf)
         await matrixResolver(workspace, (buildOpts: TSConfig) => {
-          return new Promise((resolve, reject) => {
+          return new Promise(async (resolve, reject) => {
+            const fileName = `.temp.tsconfig.${
+              workspace.path.replace('/', '_').replace(/\\/g, '_')
+            }.json`
+            await fs.promises.writeFile(fileName, JSON.stringify(buildOpts))
             const c = child_process.spawn('npx', [
               'tsc',
-              ...(buildOpts.extends ? ['-p', buildOpts.extends] : []),
-              ...Object.entries(buildOpts.compilerOptions).flatMap(([k, v]) => (
-                ['boolean', 'undefined'].includes(typeof v)
-                  ? (v === true ? [`--${k}`] : [])
-                  : [`--${k}`, v as string]
-              )),
+              '-p', fileName,
             ], {
               stdio: 'inherit',
-              cwd: path.join(process.cwd(), workspace.path),
             })
             c.stdout?.pipe(process.stdout)
             c.stderr?.pipe(process.stderr)
