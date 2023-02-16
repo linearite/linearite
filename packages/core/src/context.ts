@@ -6,18 +6,27 @@ import { Builder } from './builder'
 
 export type BuilderPluginConf<N extends Plugin.Names> = Omit<Builder.Configuration<N>, 'type'>
 
-export type Plugin<N extends Plugin.Names> = N extends N
-  ? {
-    name: N
-    call: (ctx: Context<N>) => void
-  } & (
-    | N extends `builder-${Builder.Types}`
+export type CommmonPlugin = {
+  name: string
+  call: (ctx: Context) => void
+  conf?: BuilderPluginConf<Plugin.Names>
+}
+
+export type Plugin<N extends Plugin.Names | (string & {})> =
+  N extends Plugin.Names
+    ? N extends N
       ? {
-        conf: BuilderPluginConf<N>
-      }
-      : {}
-  )
-  : never
+        name: N
+        call: (ctx: Context<N>) => void
+      } & (
+        N extends `builder-${Builder.Types}`
+          ? {
+            conf: BuilderPluginConf<N>
+          }
+          : CommmonPlugin
+      )
+      : CommmonPlugin
+    : CommmonPlugin
 
 export const definePlugin = <N extends Plugin.Names>(plugin: Plugin<N>) => plugin
 
@@ -28,8 +37,8 @@ export namespace Plugin {
     ? `builder-${B}`
     : never
   export type Names = keyof Confs | Builders
-  const cache = new Map<Names, Plugin<any>>()
-  export function r<N extends Names>(n: N) {
+  const cache = new Map<Names | string & {}, Plugin<any>>()
+  export function r<N extends Names>(n: N | string & {}) {
     if (cache.has(n)) {
       return cache.get(n) as Plugin<N>
     }
@@ -44,7 +53,7 @@ export namespace Plugin {
     throw new Error(`plugin ${n} not found`)
   }
   export function isBuilder(p: Plugin<Names>): p is Plugin<Builders> {
-    return p.name.startsWith('builder-')
+    return (p as { name: string })?.name?.startsWith('builder-')
   }
 }
 
@@ -113,17 +122,20 @@ export function resolveBuilderOpts(opts: Linearite.Configuration<Plugin.Builders
   }
   const builder = Plugin.r(`builder-${builderType}`)
   if (Plugin.isBuilder(builder)) {
+    const builderConf = (builder as any as {
+      conf: Builder.Configuration<Plugin.Builders>
+    }).conf
     const builderOpts = isInherit
-      ? builder.conf
+      ? builderConf
       : typeof opts === 'object'
-        ? Object.assign({}, builder.conf, opts)
-        : builder.conf
+        ? Object.assign({}, builderConf, opts)
+        : builderConf
 
     return [
       builder,
       resolveBuilderOptsField({
         type: builderType,
-        ...builderOpts,
+        ...(builderOpts as any),
       } as Builder.Opts)
     ] as const
   } else
