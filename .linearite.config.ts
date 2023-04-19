@@ -4,12 +4,13 @@ export default {
     platform: 'node'
   },
   matrix: {
-    '*': {
-      builder: 'dts',
-      exclude: ['@linearite/cli']
-    }
+    // TODO dts unable resolve
+    // '*': {
+    //   builder: 'dts',
+    //   exclude: ['@linearite/cli']
+    // }
   },
-  overides: {
+  overrides: {
     '@linearite/cli': {
       builder: {
         type: 'esbuild',
