@@ -10,7 +10,7 @@
     "plugins/*"
   ],
   "scripts": {
-    "prepare": "yarn cli:inn -w cli,core build && yarn cli -w cli build",
+    "postinstall": "yarn cli:inn -w cli,core build && yarn cli -w cli build",
     "cli:inn": "node -r esbuild-register packages/cli/src/index.ts",
     "cli": "yarn line"
   },
