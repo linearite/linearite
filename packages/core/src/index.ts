@@ -93,9 +93,9 @@ export namespace Linearite {
           : never
       >
     matrix?: FuzzyConfMap
-    overides?: FuzzyConfMap
+    overrides?: FuzzyConfMap
   }
-  export const InnerConfKeys = ['scope', 'exclude', 'builder', 'matrix', 'overides'] as L2T<keyof DefaultConf>
+  export const InnerConfKeys = ['scope', 'exclude', 'builder', 'matrix', 'overrides'] as L2T<keyof DefaultConf>
   export type Configuration<N extends Plugin.Names> =
     & DefaultConf<N>
     & Pick<Plugin.Confs, Exclude<N, Plugin.Builders>>
@@ -115,7 +115,7 @@ export namespace Linearite {
     Object.entries(
       conf.matrix || {}
     ).concat(Object.entries(
-      conf.overides || {}
+      conf.overrides || {}
     )).forEach(([key, conf]) => {
       fields.push(...confFieldWalker(
         name, conf, walker, prefix.concat(key)
@@ -126,7 +126,7 @@ export namespace Linearite {
   /**
    * 计算配置矩阵
    * `conf.matrix` 字段触发新增配置线
-   * `conf.overides` 字段触发往当前配置线中新增规则
+   * `conf.overrides` 字段触发往当前配置线中新增规则
    * 输出一个多条配置线的配置矩阵
    */
   export function calcConfMatrix(
@@ -144,8 +144,8 @@ export namespace Linearite {
         calcConfMatrix(conf, matrix, matrix.length, prefix.concat(key))
       })
     }
-    if (c.overides) {
-      Object.entries(c.overides).forEach(([key, conf]) => {
+    if (c.overrides) {
+      Object.entries(c.overrides).forEach(([key, conf]) => {
         calcConfMatrix(conf, matrix, index, prefix.concat(key))
       })
     }

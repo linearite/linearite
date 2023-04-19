@@ -6,7 +6,7 @@ import { Command } from 'commander'
 import Linearite, { Context, Plugin } from '@linearite/core'
 
 import './services'
-import './overides'
+import './overrides'
 import './logger'
 import { store, INIT } from './workspaces'
 import { onBuild } from './inner/on-build'
@@ -128,10 +128,11 @@ async function main() {
 
   context
     .on('ready', () => {
-      const plugins = usePlugins(conf, context.overides.matrix, workspaces)
+      const plugins = usePlugins(conf, context.overrides.matrix, workspaces)
       plugins.forEach(p => context.register(p))
 
       console.log(`loaded plugins ${
+        // @ts-ignore
         plugins.map(p => p.name).join(', ')
       } for workspaces:\n${
         workspaces.map(w => `* ${w.meta.name}`).join('\n')

@@ -44,7 +44,7 @@ describe('core', function () {
         'fuu': { builder: 'esbuild' },
         'fuo': {}
       },
-      overides: {
+      overrides: {
         'bar': { builder: 'dts' },
         'ber': { builder: 'esbuild' },
         'bor': {},
@@ -60,7 +60,7 @@ describe('core', function () {
         'fuu': { builder: 'esbuild' },
         'fuo': {}
       },
-      overides: {
+      overrides: {
         'bar': { builder: 'dts' },
         'ber': { builder: 'esbuild' },
         'bor': {},
@@ -82,7 +82,7 @@ describe('core', function () {
           matrix: {
             'bar': { builder: 'dts' }
           },
-          overides: {
+          overrides: {
             'ber': { builder: 'esbuild' }
           }
         },
@@ -96,7 +96,7 @@ describe('core', function () {
         ['foo', 'bar'],
         ['foo', 'ber'],
         ['fuu'],
-      ], 'should return all keys with nested matrix and overides')
+      ], 'should return all keys with nested matrix and overrides')
   })
   it('should test calcConfMatrix function', () => {
     const cases = {
@@ -134,7 +134,7 @@ describe('core', function () {
           ]
         ]
       ],
-      'should resolve conf with matrix and overides': [
+      'should resolve conf with matrix and overrides': [
         {
           builder: 'dts',
           matrix: {
@@ -145,7 +145,7 @@ describe('core', function () {
               builder: 'dts',
             }
           },
-          overides: {
+          overrides: {
             c: {
               builder: 'esbuild',
             },
@@ -157,8 +157,8 @@ describe('core', function () {
         conf => [
           [
             [[], conf],
-            [['c'], conf.overides.c],
-            [['d'], conf.overides.d]
+            [['c'], conf.overrides.c],
+            [['d'], conf.overrides.d]
           ],
           [
             [['a'], conf.matrix.a]
@@ -177,7 +177,7 @@ describe('core', function () {
             },
             'b': {
               builder: 'esbuild',
-              overides: {
+              overrides: {
                 'c': {
                   builder: 'dts'
                 },
@@ -198,7 +198,7 @@ describe('core', function () {
               }
             }
           },
-          overides: {
+          overrides: {
             'h': {
               builder: 'dts',
               matrix: {
@@ -209,7 +209,7 @@ describe('core', function () {
                   builder: 'esbuild'
                 }
               },
-              overides: {
+              overrides: {
                 'k': {
                   builder: 'dts'
                 }
@@ -220,16 +220,16 @@ describe('core', function () {
         conf => [
           [
             [[], conf],
-            [['h'], conf.overides.h],
-            [['h', 'k'], conf.overides.h.overides.k]
+            [['h'], conf.overrides.h],
+            [['h', 'k'], conf.overrides.h.overrides.k]
           ],
           [
             [['a'], conf.matrix.a]
           ],
           [
             [['b'], conf.matrix.b],
-            [['b', 'c'], conf.matrix.b.overides.c],
-            [['b', 'd'], conf.matrix.b.overides.d]
+            [['b', 'c'], conf.matrix.b.overrides.c],
+            [['b', 'd'], conf.matrix.b.overrides.d]
           ],
           [
             [['e'], conf.matrix.e]
@@ -241,10 +241,10 @@ describe('core', function () {
             [['e', 'g'], conf.matrix.e.matrix.g]
           ],
           [
-            [['h', 'i'], conf.overides.h.matrix.i]
+            [['h', 'i'], conf.overrides.h.matrix.i]
           ],
           [
-            [['h', 'j'], conf.overides.h.matrix.j]
+            [['h', 'j'], conf.overrides.h.matrix.j]
           ]
         ]
       ],
@@ -256,14 +256,14 @@ describe('core', function () {
       const [actual, expected] = [Linearite.calcConfMatrix(conf), calcResult(conf)]
       actual.forEach((actualItem, i) => {
         const expectedItem = expected[i]
-        // omit actualItem[number][1] overides and matrix fields
+        // omit actualItem[number][1] overrides and matrix fields
         actualItem.forEach((actualItemItem) => {
-          delete actualItemItem[1].overides
+          delete actualItemItem[1].overrides
           delete actualItemItem[1].matrix
         })
-        // omit expectedItem[number][1] overides and matrix fields
+        // omit expectedItem[number][1] overrides and matrix fields
         expectedItem.forEach((expectedItemItem) => {
-          delete expectedItemItem[1].overides
+          delete expectedItemItem[1].overrides
           delete expectedItemItem[1].matrix
         })
         expect(actualItem, `${message} - [${i}]`).to.be.deep.equal(expectedItem)

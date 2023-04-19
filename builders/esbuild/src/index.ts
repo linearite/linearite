@@ -53,7 +53,7 @@ export default definePlugin({
       corlorful,
     } = ctx
     ctx.on('build:item', async (workspace, opts) => {
-      const confs = ctx.overides.calc(workspace)
+      const confs = ctx.overrides.calc(workspace)
       await Promise.all(confs.map(async ({ builder }) => {
         const [, conf] = resolveBuilderOpts(builder)
         if (conf.type !== 'esbuild') return

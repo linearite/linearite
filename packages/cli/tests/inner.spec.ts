@@ -47,7 +47,7 @@ describe('inner', function () {
             tag: 'test-bar'
           }
         },
-        overides: {
+        overrides: {
           fuu: { builder: 'dts' },
           foo: {
             tag: 'test-foo'

@@ -2,7 +2,7 @@ import chalk from 'chalk'
 
 import { Context } from '@linearite/core'
 
-import { OveridesService } from './overides'
+import { overridesService } from './overrides'
 import { WorkspacesService } from './workspaces'
 import { LoggerService } from './logger'
 
@@ -10,7 +10,7 @@ declare module '@linearite/core' {
   export interface Context<N> {
     workspaces: WorkspacesService
     corlorful: typeof import('chalk')
-    overides: OveridesService
+    overrides: overridesService
     logger: LoggerService
   }
 }

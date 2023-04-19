@@ -3,7 +3,7 @@ import { merge, omit } from './utils'
 import minimatch from 'minimatch'
 import { removeConfKeys } from './inner/use-plugins'
 
-export class OveridesService {
+export class overridesService {
   public matrix: ReturnType<typeof Linearite.calcConfMatrix>
   constructor(
     public ctx: Context<Plugin.Names>
@@ -18,7 +18,7 @@ export class OveridesService {
     else
       scopes = scope
 
-    const overideConfigs: Linearite.Configuration<Plugin.Names>[] = []
+    const overrideConfigs: Linearite.Configuration<Plugin.Names>[] = []
     this.matrix.forEach((link, i) => {
       const conf = link.reduce((acc, [keys, computeConf]) => {
         if (keys.length === 0) {
@@ -37,13 +37,13 @@ export class OveridesService {
         return weight <= 0 ? acc : merge(acc, omit(computeConf, removeConfKeys))
       }, {})
       if (Object.keys(conf).length > 0) {
-        overideConfigs.push(
+        overrideConfigs.push(
           i === 0 ? conf : Object.assign(omit(this.ctx.config, removeConfKeys), conf)
         )
       }
     })
-    return overideConfigs
+    return overrideConfigs
   }
 }
 
-Context.service('overides', OveridesService)
+Context.service('overrides', overridesService)
