@@ -8,7 +8,7 @@ import fs from 'fs'
 
 export interface TSConfig {
   files?: string[]
-  exlude?: string[]
+  exclude?: string[]
   include?: string[]
   extends?: string
   compilerOptions: CompilerOptions
