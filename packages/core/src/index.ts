@@ -8,7 +8,7 @@ export * from './builder'
 export * from './context'
 
 export function compileMacroSyntax(str: string, workspace: Linearite.Workspace): string {
-  const macroSyntax: L2T<Linearite.MacroSytax> = [
+  const macroSyntax: L2T<Linearite.MacroSyntax> = [
     'PKG_NAME',
     'PKG_VERSION',
     'PKG_DESCRIPTION',
@@ -31,7 +31,7 @@ export function compileMacroSyntax(str: string, workspace: Linearite.Workspace):
 }
 
 export namespace Linearite {
-  export type MacroSytax =
+  export type MacroSyntax =
     | `PKG_${ 'NAME' | 'VERSION' | 'DESCRIPTION' }`
     // (pkgName = '@scope/name') => name
     | 'L_NAME'

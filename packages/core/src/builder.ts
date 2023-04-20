@@ -78,7 +78,7 @@ export namespace Builder {
     /**
      * @see https://esbuild.github.io/api/#define
      *
-     * support {@link Linearite.MacroSytax} variables
+     * support {@link Linearite.MacroSyntax} variables
      */
     define?: Record<string, string>
     minify?: boolean

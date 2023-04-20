@@ -6,7 +6,7 @@ declare module '@linearite/core' {
       /**
        * auto with tag when publish package
        *
-       * support {@link Linearite.MacroSytax} variables
+       * support {@link Linearite.MacroSyntax} variables
        *
        * @default "${{L_NAME}}@${{PKG_VERSION}}"
        */
