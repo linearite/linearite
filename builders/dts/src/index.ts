@@ -58,6 +58,7 @@ const useMatrix = createUseBuilderMatrix<'dts'>(({
   const { config, error } = ts.readConfigFile(tsconfigPath, ts.sys.readFile)
   if (error) throw error
   return {
+    extends: config.extends,
     include: filedResolver('input'),
     compilerOptions: Object.assign(config.compilerOptions, {
       outDir: filedResolver('outfile'),
