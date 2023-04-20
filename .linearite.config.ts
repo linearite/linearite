@@ -5,10 +5,13 @@ export default {
   },
   matrix: {
     // TODO dts unable resolve
-    // '*': {
-    //   builder: 'dts',
-    //   exclude: ['@linearite/cli']
-    // }
+    '*': {
+      builder: {
+        type: 'dts',
+        tsconfig: 'tsconfig.build.json',
+      },
+      exclude: ['@linearite/cli']
+    }
   },
   overrides: {
     '@linearite/cli': {
