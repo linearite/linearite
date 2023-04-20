@@ -59,7 +59,9 @@ export default definePlugin({
         if (conf.type !== 'esbuild') return
 
         const matrixResolver = useMatrix(conf)
-        ctx.logger.info(ctx.pluginName, 'build:item', workspace.meta.name, opts, conf)
+        ctx.logger.info(ctx.pluginName, 'build:item', workspace.meta.name)
+        ctx.logger.info(ctx.pluginName, 'opts', JSON.stringify(opts))
+        ctx.logger.info(ctx.pluginName, 'conf', JSON.stringify(conf))
         let continueCount = 0
         const watchOpts = {
           onRebuild(error) {
