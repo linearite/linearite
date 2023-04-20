@@ -61,7 +61,7 @@ export namespace Builder {
     /**
      * output filename, only support one entry point
      *
-     * @default will falback as follows:
+     * @default will fallback as follows:
      *
      * * esm: `workspace.meta.module`
      *
